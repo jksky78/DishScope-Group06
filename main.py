@@ -6,22 +6,31 @@ app = Flask(__name__)
 
 @app.get("/")
 def home ():
-    return render_template("homepage.html")
+    if request.method == 'GET':
+        return render_template("homepage.html")
 
-@app.route("/register")
-def register():
-    return render_template("register.html")
-
-@app.route("/create-account-table")
+@app.route("/register", methods=["GET", "POST"])
 def create_table():
-    connection = sqlite3.connect("test.db")
-    db_cursor = connection.cursor
-    table_list = '''create table user(
-        ID integer primary key autoincrement
-        username, text
-        email, text
-         
-    )'''
+    name = ""
+    if request.method == "POST":
+        connection = sqlite3.connect('test.db')
+        cursor = connection.cursor()
+        table2 = 'drop table users'
+        table = '''create table if not exists users(
+                ID integer primary key autoincrement,
+                name text,
+                password text
+        )'''
+        input_insert = "insert into users(name, password) values(?, ?)"
+        name = request.form['name']
+        cursor.execute(table)
+        cursor.execute(input_insert, (name, "random"))
+        connection.commit()
+        connection.close()
+        return f'Hello, {name}'
+    return render_template('register.html')
+    
+
 
 if __name__ == "__main__":
     app.run(debug=True)
