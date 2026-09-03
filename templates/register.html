@@ -7,33 +7,53 @@
     <link rel="stylesheet" href="../static/css/style.css">
 </head>
 <body>
-    <div>
-        <h1>Sign up</h1>
-    </div>
     <form method="POST" action="/register">
-        <label class="role">
+        <div class="form-box">
+            <h1>Sign up</h1>
+            <label class="role">
             Which role are you?
-        </label>
-        <div class="toggle_box">
+            </label>
+            <div class="toggle_box">
             <div class="button_box">
                 <div id="button"></div>
-                <button type="button" class="toggle_button" onclick="Vendor()">Student</button>
-                <button type="button" class="toggle_button" onclick="Student()">Vendor</button>
+                <button type="button" class="toggle_button" onclick="Student()">Student</button>
+                <button type="button" class="toggle_button" onclick="Vendor()">Vendor</button>
             </div>
-        </div>
-        <label>
+            </div>
+            <label>
             Username
-            <input type="text" name ="name">
+            <input type="text" name ="name" value="{{ table_username }}">
         </label>
+        {% if error_name %}
+            <p class="error-message">{{ error_name }}</p>
+        {% endif %}
         <label>
             Password
-            <input type="password" name="pass">
+            <input type="password" name="password">
         </label>
+        {% if error_pass %}
+            <p class="error-message">{{ error_pass }}</p>
+        {% endif %}
         <label>
             Email
             <input type="email" name="email">
         </label>
+        {% if error_email %}
+            <p class="error-message">{{ error_email }}</p>
+        {% endif %}
+        <div id="vendor_inputs" style="display: none;">
+            <label>
+                Vendor name
+                <input type="text" name="vendor_name">
+            </label>
+            <label>
+                Vendor location
+                <input type="text" name="Vendor_location">
+            </label>
+
+        </div>
         <button type="submit">Confirm</button>
+        </div>
 
     </form>
     <script src="../static/javascript/index.js"></script>

@@ -1,5 +1,11 @@
 body {
-    background-color: rgb(198, 136, 60);
+    background-color: rgb(164, 180, 238);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    margin: 0;
+    padding: 0;
 }
 
 .toggle_box {
@@ -28,7 +34,35 @@ body {
     position: absolute;
     width: 110px;
     height: 100%;
-    background-color: aqua;
+    background-color: rgb(0, 255, 89);
     border-radius: 30px; /* For button shape */
     transition: 1s;
+}
+
+.form-box {
+    margin: 0px auto;
+    width: 100%; /* Form box width */
+    max-width: 450;
+    border-radius: 10px;
+    background-color: rgb(255, 255, 255);
+    padding: 20px;
+    margin-top: 60px;
+}
+
+input {
+    margin-bottom: 30px;
+    width: 100%;
+    font-size: 16px;
+    background-color: rgb(251, 251, 240);
+}
+
+label {
+    font-size: 16px;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 10px;
 }
