@@ -4,16 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="../static/css/style.css">
 </head>
 <body>
     <div>
         <h1>Sign up</h1>
     </div>
     <form method="POST" action="/register">
-        <input type="text" name ="name">
+        <label class="role">
+            Which role are you?
+        </label>
+        <div class="toggle_box">
+            <div class="button_box">
+                <div id="button"></div>
+                <button type="button" class="toggle_button" onclick="Vendor()">Student</button>
+                <button type="button" class="toggle_button" onclick="Student()">Vendor</button>
+            </div>
+        </div>
+        <label>
+            Username
+            <input type="text" name ="name">
+        </label>
+        <label>
+            Password
+            <input type="password" name="pass">
+        </label>
+        <label>
+            Email
+            <input type="email" name="email">
+        </label>
         <button type="submit">Confirm</button>
 
     </form>
-    
+    <script src="../static/javascript/index.js"></script>
 </body>
 </html>
