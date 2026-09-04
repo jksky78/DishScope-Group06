@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f9f9f9;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th {
+            background: #f2f2f2;
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .available {
+            color: green;
+            font-weight: bold;
+        }
+        .unavailable {
+            color: red;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: inline-block;
+            width: 80px;
+        }
+        input, select {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+        button {
+            padding: 6px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        button.danger:hover {
+            background: #a71d2a;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #5a6268;
+        }
+        #cancelBtn {
+            display: none;
+        }
+        .stats {
+            background: #e9ecef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .stats span {
+            margin-right: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Menu Management</h1>
+
+    <div class="stats">
+        <span>Total: <span id="total">0</span></span>
+        <span>Available: <span id="available">0</span></span>
+        <span>Unavailable: <span id="unavailable">0</span></span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Vendor</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="menuBody">
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2 id="formTitle">Add New Dish</h2>
+    <form id="dishForm">
+        <input type="hidden" id="editId">
+        <div class="form-group">
+            <label>Dish Name:</label>
+            <input type="text" id="dishName" placeholder="e.g. Chicken Rice" required>
+        </div>
+        <div class="form-group">
+            <label>Category:</label>
+            <select id="dishCategory">
+                <option value="Main">Main</option>
+                <option value="Appetizer">Appetizer</option>
+                <option value="Dessert">Dessert</option>
+                <option value="Drink">Drink</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Price (RM):</label>
+            <input type="number" id="dishPrice" step="0.01" min="0" placeholder="0.00" required>
+        </div>
+        <div class="form-group">
+            <label>Vendor:</label>
+            <input type="text" id="vendorName" placeholder="e.g. Chicken Delight" required>
+        </div>
+        <div class="form-group">
+            <label>Available:</label>
+            <input type="checkbox" id="dishAvailable" checked>
+        </div>
+        <div class="form-group">
+            <button type="submit" id="submitBtn">Add Dish</button>
+            <button type="button" id="cancelBtn" class="secondary">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    var dishes = [];
+    var editId = null;
+
+    function loadData() {
+        var stored = localStorage.getItem('menuDraft');
+        if (stored) {
+            dishes = JSON.parse(stored);
+        } else {
+            dishes = [
+                { id: '1', name: 'Margherita Pizza', category: 'Main', price: 14.99, vendor: 'Chicken Delight', available: true },
+                { id: '2', name: 'Tiramisu', category: 'Dessert', price: 8.25, vendor: 'Bella Italia', available: false }
+            ];
+            saveData();
+        }
+        renderTable();
+    }
+
+    function saveData() {
+        localStorage.setItem('menuDraft', JSON.stringify(dishes));
+    }
+
+    function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    }
+
+    function renderTable() {
+        var tbody = document.getElementById('menuBody');
+        var html = '';
+        for (var i = 0; i < dishes.length; i++) {
+            var d = dishes[i];
+            var statusClass = d.available ? 'available' : 'unavailable';
+            var statusText = d.available ? 'Available' : 'Unavailable';
+            html += '<tr>';
+            html += '<td>' + d.name + '</td>';
+            html += '<td>' + d.category + '</td>';
+            html += '<td>$' + d.price.toFixed(2) + '</td>';
+            html += '<td>' + d.vendor + '</td>';
+            html += '<td class="' + statusClass + '">' + statusText + '</td>';
+            html += '<td>';
+            html += '<button onclick="editDish(\'' + d.id + '\')">Edit</button> ';
+            html += '<button class="danger" onclick="deleteDish(\'' + d.id + '\')">Delete</button> ';
+            html += '<button onclick="toggleDish(\'' + d.id + '\')">Toggle</button>';
+            html += '</td>';
+            html += '</tr>';
+        }
+        tbody.innerHTML = html;
+        updateStats();
+    }
+
+    function updateStats() {
+        var total = dishes.length;
+        var available = 0;
+        for (var i = 0; i < dishes.length; i++) {
+            if (dishes[i].available) available++;
+        }
+        var unavailable = total - available;
+        document.getElementById('total').innerHTML = total;
+        document.getElementById('available').innerHTML = available;
+        document.getElementById('unavailable').innerHTML = unavailable;
+    }
+
+    function deleteDish(id) {
+        if (!confirm('Delete this dish?')) return;
+        var newList = [];
+        for (var i = 0; i < dishes.length; i++) {
+            if (dishes[i].id != id) newList.push(dishes[i]);
+        }
+        dishes = newList;
+        saveData();
+        renderTable();
+    }
+
+    function toggleDish(id) {
+        for (var i = 0; i < dishes.length; i++) {
+            if (dishes[i].id == id) {
+                dishes[i].available = !dishes[i].available;
+                break;
+            }
+        }
+        saveData();
+        renderTable();
+    }
+
+    function editDish(id) {
+        var dish = null;
+        for (var i = 0; i < dishes.length; i++) {
+            if (dishes[i].id == id) {
+                dish = dishes[i];
+                break;
+            }
+        }
+        if (!dish) return;
+
+        editId = id;
+        document.getElementById('editId').value = id;
+        document.getElementById('dishName').value = dish.name;
+        document.getElementById('dishCategory').value = dish.category;
+        document.getElementById('dishPrice').value = dish.price;
+        document.getElementById('vendorName').value = dish.vendor;
+        document.getElementById('dishAvailable').checked = dish.available;
+
+        document.getElementById('formTitle').innerHTML = 'Edit Dish';
+        document.getElementById('submitBtn').innerHTML = 'Update Dish';
+        document.getElementById('cancelBtn').style.display = 'inline-block';
+    }
+
+    function resetForm() {
+        editId = null;
+        document.getElementById('editId').value = '';
+        document.getElementById('dishName').value = '';
+        document.getElementById('dishCategory').value = 'Main';
+        document.getElementById('dishPrice').value = '';
+        document.getElementById('vendorName').value = '';
+        document.getElementById('dishAvailable').checked = true;
+
+        document.getElementById('formTitle').innerHTML = 'Add New Dish';
+        document.getElementById('submitBtn').innerHTML = 'Add Dish';
+        document.getElementById('cancelBtn').style.display = 'none';
+    }
+
+    document.getElementById('cancelBtn').addEventListener('click', function() {
+        resetForm();
+    });
+
+    document.getElementById('dishForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        var name = document.getElementById('dishName').value.trim();
+        var category = document.getElementById('dishCategory').value;
+        var price = parseFloat(document.getElementById('dishPrice').value);
+        var vendor = document.getElementById('vendorName').value.trim();
+        var available = document.getElementById('dishAvailable').checked;
+
+        if (!name || !category || isNaN(price) || price < 0 || !vendor) {
+            alert('Please fill all fields correctly.');
+            return;
+        }
+
+        var id = document.getElementById('editId').value;
+
+        if (id) {
+            // Update existing dish
+            for (var i = 0; i < dishes.length; i++) {
+                if (dishes[i].id == id) {
+                    dishes[i].name = name;
+                    dishes[i].category = category;
+                    dishes[i].price = price;
+                    dishes[i].vendor = vendor;
+                    dishes[i].available = available;
+                    break;
+                }
+            }
+        } else {
+            // Add new dish
+            var newDish = {
+                id: generateId(),
+                name: name,
+                category: category,
+                price: price,
+                vendor: vendor,
+                available: available
+            };
+            dishes.push(newDish);
+        }
+
+        saveData();
+        renderTable();
+        resetForm();
+    });
+
+    loadData();
+</script>
+
+</body>
+</html>
