@@ -27,7 +27,7 @@ def create_table():
         name = request.form['name']
         password = request.form['password']
         email = request.form['email']
-        table_username = request.form.get("name")
+        table_username = request.form.get("name", "").strip()
         table_password = (request.form.get("password",) or "").strip()
         table_email = request.form.get("email")
         if not table_username:
@@ -41,7 +41,7 @@ def create_table():
             return render_template("register.html", table_username=table_username, table_password=table_password, error_email=error_email)
         else:
             cursor.execute(table)
-            cursor.execute(input_insert, (name, password, email))
+            cursor.execute(input_insert, (table_username, password, email))
             connection.commit()
             connection.close()
             return f'Hello, {name}'
