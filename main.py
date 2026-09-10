@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from itsdangerous import URLSafeSerializer
 import sqlite3
 
 
 app = Flask(__name__)
+app.secret_key = "DishScope-000"
 
 @app.get("/")
 def home ():
@@ -98,8 +99,8 @@ def login():
 
     return render_template("login.html")
 
-@app.route("/reset-pass", methods=["GET", "POST"])
-def reset_pass():
+@app.route("/verify-email", methods=["GET", "POST"])
+def verify_email():
     if request.method == "POST":
         connection = sqlite3.connect('test.db')
         cursor = connection.cursor()
@@ -113,13 +114,53 @@ def reset_pass():
         
         if result:
             print("Resetting")
+            session["reset_email"] = table_email
             return render_template("change-pass.html")
+
         else:
             print("Email does not exist")
 
         connection.close()
 
     return render_template("email-check.html")
+
+@app.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+
+    if request.method == "POST":
+
+        new_password = request.form.get("new_password", "").strip()
+        confirm_password = request.form.get("confirm_password", "").strip()
+        # Check that passwords match
+        if new_password != confirm_password:
+            return "Passwords do not match"
+
+        # Get the email from the previous verification step
+        email = session.get("reset_email")
+        print("New password:", new_password)
+        print("Email:", email)
+        if not email:
+            return "Email verification required"
+
+        connection = sqlite3.connect("test.db")
+        cursor = connection.cursor()
+
+        # Update the password belonging to that email
+        cursor.execute(
+            "UPDATE users SET password = ? WHERE email = ?",
+            (new_password, email)
+        )
+
+        connection.commit()
+
+        connection.close()
+
+        # Remove the email after the password has been changed
+        session.pop("reset_email", None)
+
+        return redirect("/login")
+
+    return render_template("change-pass.html")
 
 
 if __name__ == "__main__":

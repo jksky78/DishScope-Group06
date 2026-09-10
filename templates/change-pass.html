@@ -9,26 +9,21 @@
         <h1>DishScope</h1>
     </header>
 </head>
-<body class="change-password-page">
+<body>
 
     <div class="password-container">
         <h2>Change Password</h2>
         <p class="subtitle">Update your account password securely.</p>
         
-        <form>
-            <div class="input-group">
-                <label for="current-password">Current Password</label>
-                <input type="password" id="current-password" name="current-password" value="" required>
-            </div>
-            
-            <div class="input-group">
-                <label for="new-password">New Password</label>
-                <input type="password" id="new-password" name="new-password" value="" required>
+        <form method="POST" action="/reset-password">
+            <div class="input-group-reset">
+                <label for="new_password">New Password</label>
+                <input type="password" id="new_password" name="new_password" value="" required>
             </div>
 
-            <div class="input-group">
-                <label for="confirm-password">Confirm New Password</label>
-                <input type="password" id="confirm-password" name="confirm-password" value="" required>
+            <div class="input-group-reset">
+                <label for="confirm_password">Confirm New Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" value="" required>
             </div>
 
             <button type="submit" class="update-btn">Update Password</button>

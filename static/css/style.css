@@ -61,7 +61,7 @@ header {
     border-radius: 10px;
     background-color: rgb(255, 255, 255);
     padding: 20px;
-    margin-top: 100px;
+    margin-top: 200px;
     
 }
 
@@ -320,4 +320,26 @@ body.change-password-page {
     cursor: pointer;
     padding-bottom: 20px;
     transition: background-color 0.3s;
+}
+
+
+.input-group-reset label {
+    display: block;
+    margin-bottom: 8px;
+    color: #f4ecec;
+    font-size: 14px;
+}
+
+.input-group-reset input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #667eea;
 }
