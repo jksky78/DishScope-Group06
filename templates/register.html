@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="../static/css/style.css">
+    <header>
+        <h1>DishScope</h1>
+    </header>
 </head>
 <body>
     <form method="POST" action="/register">
@@ -54,9 +57,11 @@
 
         </div>
         <button type="submit">Confirm</button>
+        <p class="helper">Already has an account? <a href="{{ url_for('login') }}">Login</a></p>
         </div>
 
     </form>
+
     <script src="../static/javascript/index.js"></script>
 </body>
 </html>
