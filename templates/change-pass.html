@@ -19,16 +19,18 @@
             <div class="input-group-reset">
                 <label for="new_password">New Password</label>
                 <input type="password" id="new_password" name="new_password" value="" required>
+                <button type="button" onclick="showPassword_New()" class="show-pass-btn">Show Password</button>
             </div>
 
             <div class="input-group-reset">
                 <label for="confirm_password">Confirm New Password</label>
                 <input type="password" id="confirm_password" name="confirm_password" value="" required>
+                <button type="button" onclick="showPassword_Confirm()" class="show-pass-btn">Show Password</button>
             </div>
 
             <button type="submit" class="update-btn">Update Password</button>
         </form>
     </div>
-
+    <script src="../static/javascript/index.js"></script>
 </body>
 </html>

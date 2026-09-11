@@ -343,3 +343,7 @@ body.change-password-page {
 .input-group input:focus {
     border-color: #667eea;
 }
+
+.show-pass-btn {
+    margin-bottom: 20px;
+}
