@@ -11,3 +11,33 @@ function Student() {
     document.getElementById("vendor_inputs").style.display = "none";
     document.getElementById("role").value = "student";
 }
+
+function showPassword() {
+    let password = document.getElementById("password");
+
+    if (password.type === "password") {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+}
+
+function showPassword_New() {
+    let password = document.getElementById("new_password");
+
+    if (password.type === "password") {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+}
+
+function showPassword_Confirm() {
+    let password = document.getElementById("confirm_password");
+
+    if (password.type === "password") {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+}

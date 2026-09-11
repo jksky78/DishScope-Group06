@@ -4,10 +4,25 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 50vh;
+    flex-direction: column;
     margin: 0;
     padding: 0;
+    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
+header {
+    background-color: #0b131e;
+    color: #ffffff;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
 .toggle_box {
     width: 225px; 
     margin: 35px auto;
@@ -46,7 +61,8 @@ body {
     border-radius: 10px;
     background-color: rgb(255, 255, 255);
     padding: 20px;
-    margin-top: 60px;
+    margin-top: 200px;
+    
 }
 
 input {
@@ -65,4 +81,269 @@ label {
     font-size: 14px;
     margin-top: 5px;
     margin-bottom: 10px;
+}
+
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body.login-page {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Login Box Container */
+.login-container {
+    margin-top: 80px;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-container h2 {
+    margin-bottom: 24px;
+    color: #333333;
+    text-align: center;
+}
+
+/* Input Fields Styling */
+.input-group {
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555555;
+    font-size: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #667eea;
+}
+
+/* Remember me and Forgot password layout */
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #555555;
+}
+
+.remember-forgot a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.remember-forgot a:hover {
+    text-decoration: underline;
+}
+
+/* Button Styling */
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #667eea;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-btn:hover {
+    background-color: #5a6fd6;
+}
+
+/* Register link footer */
+.register-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555555;
+}
+
+.register-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+
+/* Change Password Page Specific Styles */
+body.change-password-page {
+    background-color: #0b131e; /* Deep dark navy/blue background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.password-container {
+    background: #111a2c; /* Slightly lighter dark container card */
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid #1e293b;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.password-container h2 {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.password-container .subtitle {
+    color: #94a3b8; /* Muted gray text */
+    font-size: 14px;
+    margin-bottom: 28px;
+}
+
+.password-container .input-group {
+    margin-bottom: 20px;
+}
+
+.password-container .input-group label {
+    display: block;
+    color: #cbd5e1;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.password-container .input-group input {
+    width: 100%;
+    padding: 12px 14px;
+    background-color: #19263e; /* Dark input background */
+    border: 1px solid #283853;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.password-container .input-group input:focus {
+    border-color: #38bdf8; /* Bright blue focus ring */
+}
+
+.update-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background-color: #1d4ed8; /* Deep blue button */
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.update-btn:hover {
+    background-color: #2563eb;
+}
+
+
+.user-verification-container {
+    margin: 0px auto;
+    width: 500px; /* Form box width */
+    height: 400px;
+    max-width: 450;
+    border-radius: 10px;
+    background-color: rgb(255, 255, 255);
+    padding: 20px;
+    margin-top: 120px;
+
+}
+
+
+.input-group-email {
+    margin-top: 30px;
+    margin-bottom: 100px;
+}
+
+.input-group-email input {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #667eea;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    padding-bottom: 20px;
+    transition: background-color 0.3s;
+}
+
+
+.input-group-reset label {
+    display: block;
+    margin-bottom: 8px;
+    color: #f4ecec;
+    font-size: 14px;
+}
+
+.input-group-reset input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #667eea;
+}
+
+.show-pass-btn {
+    margin-bottom: 20px;
 }
