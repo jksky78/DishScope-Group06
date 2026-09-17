@@ -25,19 +25,23 @@
             >
 
             <div class="controls">
-                <select>
-                    <option>Filter:</option>
-                    <option>Food</option>
-                    <option>Drink</option>
-                    <option>Dessert</option>
-                </select>
 
-                <select>
-                    <option>Sort by:</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                </select>
-            </div>
+    <select id="filterSelect">
+        <option value="all">Filter:</option>
+        <option value="main">Main Dish</option>
+        <option value="side">Side Dish</option>
+    </select>
+
+
+    <select id="sortSelect">
+        <option value="default">Sort by:</option>
+        <option value="priceLow">Lowest Price</option>
+        <option value="priceHigh">Highest Price</option>
+        <option value="ratingLow">Lowest Rating</option>
+        <option value="ratingHigh">Highest Rating</option>
+    </select>
+
+    </div>
 
             <!-- Profile icon -->
             <div class="profile">
@@ -52,7 +56,11 @@
         <div id="dishContainer" class="dish-container">
 
            <!-- Dish 1 -->
-            <div class="dish-card">
+            <div class="dish-card"
+                 data-category="main"
+                 data-price="20"
+                 data-rating="5">
+
                 <div class="dish-picture">Picture</div>
 
                 <h2>beef Rice</h2>
@@ -62,8 +70,12 @@
                 <p><b>Vendor's name:</b> Ali's Kitchen</p>
                 <p><b>Availability:</b> Yes</p>
             </div>
-            <!-- Dish 1 -->
-            <div class="dish-card">
+            <!-- Dish 2 -->
+            <div class="dish-card"
+                 data-category="main"
+                 data-price="8"
+                 data-rating="2">
+
                 <div class="dish-picture">Picture</div>
 
                 <h2> noodles</h2>
@@ -73,19 +85,27 @@
                 <p><b>Vendor's name:</b> Ali's Kitchen</p>
                 <p><b>Availability:</b> Yes</p>
             </div>
-            <!-- Dish 1 -->
-            <div class="dish-card">
+            <!-- Dish 3 -->
+            <div class="dish-card"
+                 data-category="side"
+                 data-price="10"
+                 data-rating="5">
+
                 <div class="dish-picture">Picture</div>
 
                 <h2>cake</h2>
 
                 <p><b>Category:</b> side Dish</p>
-                <p><b>Price:</b> RM 8.00</p>
+                <p><b>Price:</b> RM 10.00</p>
                 <p><b>Vendor's name:</b> Ali's Kitchen</p>
                 <p><b>Availability:</b> Yes</p>
             </div>
-            <!-- Dish 1 -->
-            <div class="dish-card">
+            <!-- Dish 4 -->
+            <div class="dish-card"
+                 data-category="main"
+                 data-price="8"
+                 data-rating="4">
+
                 <div class="dish-picture">Picture</div>
 
                 <h2>Chicken Rice</h2>
@@ -95,19 +115,27 @@
                 <p><b>Vendor's name:</b> Ali's Kitchen</p>
                 <p><b>Availability:</b> Yes</p>
             </div>
-            <!-- Dish 1 -->
-            <div class="dish-card">
+            <!-- Dish 5 -->
+            <div class="dish-card"
+                 data-category="main"
+                 data-price="12"
+                 data-rating="4">
+
                 <div class="dish-picture">Picture</div>
 
                 <h2>Chicken Rice</h2>
 
                 <p><b>Category:</b> Main Dish</p>
-                <p><b>Price:</b> RM 8.00</p>
+                <p><b>Price:</b> RM 12.00</p>
                 <p><b>Vendor's name:</b> Ali's Kitchen</p>
                 <p><b>Availability:</b> Yes</p>
             </div>
-            <!-- Dish 1 -->
-            <div class="dish-card">
+            <!-- Dish 6 -->
+            <div class="dish-card"
+                 data-category="main"
+                 data-price="8"
+                 data-rating="3">
+
                 <div class="dish-picture">Picture</div>
 
                 <h2>fried Rice</h2>
