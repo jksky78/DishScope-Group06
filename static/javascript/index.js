@@ -97,9 +97,6 @@ const dishContainer = document.getElementById("dishContainer");
 
 
 // Get all dish cards
-let dishCards = Array.from(
-    document.querySelectorAll(".dish-card")
-);
 
 
 // ================================
