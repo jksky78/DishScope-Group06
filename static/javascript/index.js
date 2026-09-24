@@ -69,7 +69,9 @@ function showPassword_Confirm() {
 
 
 const searchBar = document.getElementById("searchbar");
-const dishCards = document.querySelectorAll(".dish-card");
+
+const dishContainer = document.getElementById("dishContainer");
+const dishCards = Array.from(document.querySelectorAll(".dish-card"));
 const filterSelect = document.getElementById("filterSelect");
 const sortSelect = document.getElementById("sortSelect");
 
@@ -93,7 +95,7 @@ searchBar.addEventListener("input", function () {
 
 
 
-const dishContainer = document.getElementById("dishContainer");
+
 
 
 // Get all dish cards
@@ -186,6 +188,7 @@ function updateDishes() {
     // SORT
     // --------------------------------
 
+
     if (selectedSort === "priceLow") {
 
         dishCards.sort(function (a, b) {
@@ -243,4 +246,11 @@ function updateDishes() {
     });
 
 }
+
+
+sortSelect.addEventListener("change", function () {
+    console.log("Selected:", sortSelect.value);
+    updateDishes();
+});
+
 

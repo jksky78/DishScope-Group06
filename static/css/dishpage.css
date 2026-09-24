@@ -16,6 +16,89 @@ h1 {
 }
 
 
+header {
+    background-color: #0b131e;
+    color: #ffffff;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0b131e; /* Matches your dark theme */
+    padding: 15px 30px;
+    color: #ffffff;
+}
+.nav-menu {
+    position: relative;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: transparent;
+    color: white;
+    padding: 8px 16px;
+    font-size: 1rem;
+    border: 1px solid #2a3b4c;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.dropbtn:hover {
+    background-color: #1a2634;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0; /* Aligns dropdown to the right edge */
+    background-color: #1a2634;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.3);
+    z-index: 1000;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #2a3b4c;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: white;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.95rem;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #2a3b4c;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Logo styling */
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+
+
 /* Main page border */
 .page {
     width: 100%;
@@ -116,6 +199,9 @@ h1 {
 /* Dish card */
 .dish-card {
     height: 212px;
+
+    height: auto;
+
 
     border: 2px solid #4f78c9;
 
