@@ -15,6 +15,7 @@ h1 {
     margin: 0 0 20px 5px;
 }
 
+
 header {
     background-color: #0b131e;
     color: #ffffff;
@@ -95,6 +96,8 @@ header {
     font-weight: bold;
     color: #ffffff;
 }
+
+
 
 /* Main page border */
 .page {
@@ -196,7 +199,10 @@ header {
 /* Dish card */
 .dish-card {
     height: 212px;
+
     height: auto;
+
+
     border: 2px solid #4f78c9;
 
     padding: 10px;
