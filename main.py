@@ -9,7 +9,7 @@ app.secret_key = "DishScope-000"
 @app.get("/")
 def home ():
     if request.method == 'GET':
-        return render_template("dishpage.html")
+        return render_template("homepage.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
