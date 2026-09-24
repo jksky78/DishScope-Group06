@@ -51,110 +51,52 @@
 
         </div>
 
-
-        <!-- Dish cards -->
-        <div id="dishContainer" class="dish-container">
-
-           <!-- Dish 1 -->
-            <div class="dish-card"
-                 data-category="main"
-                 data-price="20"
-                 data-rating="5">
-
-                <div class="dish-picture">Picture</div>
-
-                <h2>beef Rice</h2>
-
-                <p><b>Category:</b> Main Dish</p>
-                <p><b>Price:</b> RM 20.00</p>
-                <p><b>Vendor's name:</b> Ali's Kitchen</p>
-                <p><b>Availability:</b> Yes</p>
+    <!-- Header section with your menu dropdown -->
+    <header class="navbar">
+        <div class="logo">DishScope</div>
+        <nav class="nav-menu">
+            <div class="dropdown">
+                <button class="dropbtn">Menu ▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('home') }}">Home</a>
+                </div>
             </div>
-            <!-- Dish 2 -->
-            <div class="dish-card"
-                 data-category="main"
-                 data-price="8"
-                 data-rating="2">
+        </nav>
+    </header>
 
-                <div class="dish-picture">Picture</div>
+    <!-- Main Content Wrapper -->
+    <main class="main-content">
+        
 
-                <h2> noodles</h2>
+        <!-- The Grid Container that loops through all SQLite dishes -->
+        <div class="dish-container">
+            {% for dish in dishes %}
+            <div class="dish-card">
+                <!-- Dish Picture Preview -->
+                <div class="dish-picture">
+                    {% if dish['image_filename'] %}
+                        <img src="{{ url_for('static', filename='uploads/' + dish['image_filename']) }}" alt="{{ dish['name'] }}" style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                        Picture
+                    {% endif %}
+                </div>
 
-                <p><b>Category:</b> Main Dish</p>
-                <p><b>Price:</b> RM 8.00</p>
-                <p><b>Vendor's name:</b> Ali's Kitchen</p>
-                <p><b>Availability:</b> Yes</p>
+                <!-- Database Columns injected dynamically -->
+                <h2>{{ dish['name'] }}</h2>
+                <p><b>Category:</b> {{ dish['category'] }}</p>
+                <p><b>Price:</b> RM {{ dish['price'] }}</p>
+                <p><b>Description:</b> {{ dish['description'] }}</p>
+                <p><b>Calories:</b> {{ dish['calories'] }} kcal</p>
+                <p><b>Vegetarian:</b> {{ dish['vegetarian'] }}</p>
+                <p><b>Spicy Level:</b> {{ dish['spicy_level'] }}</p>
+                <p><b>Availability:</b> {{ dish['availability'] }}</p>
             </div>
-            <!-- Dish 3 -->
-            <div class="dish-card"
-                 data-category="side"
-                 data-price="10"
-                 data-rating="5">
-
-                <div class="dish-picture">Picture</div>
-
-                <h2>cake</h2>
-
-                <p><b>Category:</b> side Dish</p>
-                <p><b>Price:</b> RM 10.00</p>
-                <p><b>Vendor's name:</b> Ali's Kitchen</p>
-                <p><b>Availability:</b> Yes</p>
-            </div>
-            <!-- Dish 4 -->
-            <div class="dish-card"
-                 data-category="main"
-                 data-price="8"
-                 data-rating="4">
-
-                <div class="dish-picture">Picture</div>
-
-                <h2>Chicken Rice</h2>
-
-                <p><b>Category:</b> Main Dish</p>
-                <p><b>Price:</b> RM 8.00</p>
-                <p><b>Vendor's name:</b> Ali's Kitchen</p>
-                <p><b>Availability:</b> Yes</p>
-            </div>
-            <!-- Dish 5 -->
-            <div class="dish-card"
-                 data-category="main"
-                 data-price="12"
-                 data-rating="4">
-
-                <div class="dish-picture">Picture</div>
-
-                <h2>Chicken Rice</h2>
-
-                <p><b>Category:</b> Main Dish</p>
-                <p><b>Price:</b> RM 12.00</p>
-                <p><b>Vendor's name:</b> Ali's Kitchen</p>
-                <p><b>Availability:</b> Yes</p>
-            </div>
-            <!-- Dish 6 -->
-            <div class="dish-card"
-                 data-category="main"
-                 data-price="8"
-                 data-rating="3">
-
-                <div class="dish-picture">Picture</div>
-
-                <h2>fried Rice</h2>
-
-                <p><b>Category:</b> Main Dish</p>
-                <p><b>Price:</b> RM 8.00</p>
-                <p><b>Vendor's name:</b> Ali's Kitchen</p>
-                <p><b>Availability:</b> Yes</p>
-            </div>
+            {% else %}
+                <p>No dishes found in the database yet!</p>
+            {% endfor %}
         </div>
 
-    </div>
-    
-
-            </div>
-
-    </div>
-
+    </main>
     <script src="../static/javascript/index.js"></script>
-
 </body>
 </html>
