@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session 
 from itsdangerous import URLSafeSerializer
+from werkzeug.security import check_password_hash
 import sqlite3
 
 
@@ -16,6 +17,7 @@ def register():
     name = ""
     errors = []
     if request.method == "POST":
+        print(">>> SUCCESS: The register POST route was hit! <<<")
         role = request.form.get("role")
         connection = sqlite3.connect('test.db')
         cursor = connection.cursor()
@@ -66,7 +68,6 @@ def register():
             connection.commit()
             connection.close()
             return f'Hello, {name}'
-            
 
 
     return render_template('register.html')
@@ -91,7 +92,7 @@ def login():
 
         if result:
             print("Login successful!")
-            return render_template("homepage.html")
+            return render_template("dishpage.html")
         else:
             print("Invalid username or password!")
 
@@ -161,6 +162,67 @@ def reset_password():
         return redirect("/login")
 
     return render_template("change-pass.html")
+
+@app.route("/add_dish", methods=["GET", "POST"])
+def add_dish():
+    return render_template("dish-registration.html")
+
+
+@app.route("/create_dish", methods=["GET", "POST"])
+def create_dish():
+  if request.method == "POST":
+    conn = sqlite3.connect("dish_database.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+            CREATE TABLE IF NOT EXISTS dishes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                category TEXT,
+                price REAL,
+                description TEXT,
+                calories INTEGER,
+                ingredients TEXT,
+                vegetarian TEXT,
+                spicy_level TEXT,
+                allergens TEXT,
+                availability TEXT,
+                image_filename TEXT
+            )
+        """)
+    input_insert_dish = "insert into dishes (name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, image_filename) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    name = request.form.get("name")
+    category = request.form.get("category")
+    price = request.form.get("price")
+    description = request.form.get("description")
+    calories = request.form.get("calories")
+    ingredients = request.form.get("ingredients")
+    vegetarian = request.form.get("vegetarian")
+    spicy_level = request.form.get("spicy_level")
+    allergens = request.form.get("allergens")
+    availability = request.form.get("availability")
+
+    # Handle image filename if uploaded
+    image_filename = ""
+    if "image" in request.files:
+        file = request.files["image"]
+        if file.filename != "":
+            image_filename = file.filename
+    cursor.execute(input_insert_dish, (name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, image_filename))
+    conn.commit()
+    conn = sqlite3.connect("dish_database.db")
+    conn.row_factory = (
+      sqlite3.Row
+  )  # This lets you use column names like dish['name']
+    cursor = conn.cursor()
+
+  # 2. Fetch all dishes from the table
+    cursor.execute("SELECT * FROM dishes")
+    dishes = cursor.fetchall()  # Grab all rows
+
+  # 3. Close the connection
+    conn.close()
+    return render_template("dishpage.html", dishes=dishes)
+
 
 
 if __name__ == "__main__":

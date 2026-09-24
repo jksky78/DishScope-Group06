@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Dish</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <header>
+        <h1>DishScope</h1>
+        <nav class="nav-menu">
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▼</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('dish_view') }}">View Dish</a>
+                <a href="{{ url_for('add_dish') }}">Add Dish</a>
+            </div>
+        </div>
+    </nav>
+    </header>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Add new dish</h2>
+        <p class="instruction">Your Dish (Type in empty box or select fixed option):</p>
+
+        <form action="/create_dish" method="POST" enctype="multipart/form-data">
+            
+            <div class="form-main-layout">
+                <!-- Left Side: Inputs -->
+                <div class="form-fields">
+                    <div class="form-group">
+                        <label>Dish name:</label>
+                        <input type="text" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category:</label>
+                        <input type="text" name="category">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Price:</label>
+                        <input type="number" step="0.5" name="price">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description about dish:</label>
+                        <input type="text" name="description">
+                    </div>
+
+                    <div class="health-section">
+                        <p><b>Basic health information:</b></p>
+                        <ul>
+                            <li>
+                                <label>Calories:</label>
+                                <input type="number" name="calories">
+                            </li>
+                            <li>
+                                <label>Ingredients:</label>
+                                <input type="text" name="ingredients">
+                            </li>
+                            <li>
+                                <label>Vegetarian status:</label>
+                                <select name="vegetarian">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>Spicy level:</label>
+                                <select name="spicy_level">
+                                    <option value="Not spicy">Not spicy</option>
+                                    <option value="Mild">Mild</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Extra Spicy">Extra Spicy</option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>Allergens:</label>
+                                <input type="text" name="allergens">
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Availability:</label>
+                        <select name="availability">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Right Side: Image Preview & Upload -->
+                <div class="image-upload-section">
+                    <div class="image-preview-box">
+                        <img id="preview" src="" alt="Image preview" style="display:none; max-width:100%; max-height:100%;">
+                        <span id="preview-text">Image preview</span>
+                    </div>
+                    <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" onchange="previewImage(event)">
+                    <button type="button" onclick="document.getElementById('imageInput').click();" class="upload-btn">Upload Image</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-actions">
+                <button type="submit" class="btn-add">Add Dish</button>
+                <button type="reset" class="btn-discard" onclick="clearPreview()">Discard Dish</button>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('preview');
+                output.src = reader.result;
+                output.style.display = 'block';
+                document.getElementById('preview-text').style.display = 'none';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+        function clearPreview() {
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('preview-text').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -7,7 +7,6 @@ body {
     flex-direction: column;
     margin: 0;
     padding: 0;
-    height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 header {
@@ -22,6 +21,77 @@ header {
     justify-content: space-between;
     align-items: center;
     z-index: 1000;
+}
+
+/* Main Header Bar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0b131e; /* Matches your dark theme */
+    padding: 15px 30px;
+    color: #ffffff;
+}
+
+/* Logo styling */
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+/* Dropdown Container */
+.nav-menu {
+    position: relative;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: transparent;
+    color: white;
+    padding: 8px 16px;
+    font-size: 1rem;
+    border: 1px solid #2a3b4c;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.dropbtn:hover {
+    background-color: #1a2634;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0; /* Aligns dropdown to the right edge */
+    background-color: #1a2634;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.3);
+    z-index: 1000;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #2a3b4c;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: white;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.95rem;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #2a3b4c;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
 }
 .toggle_box {
     width: 225px; 
@@ -56,15 +126,58 @@ header {
 
 .form-box {
     margin: 0px auto;
-    width: 100%; /* Form box width */
+    width: 600px; /* Form box width */
     max-width: 450;
     border-radius: 10px;
     background-color: rgb(255, 255, 255);
     padding: 20px;
-    margin-top: 200px;
+    margin-top: 100px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.form-box label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555555;
+    font-size: 14px;
     
 }
 
+.form-box input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+.form-box h1 {
+    text-align: center;
+}
+
+.form-box label.role {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.form-box button.submits {
+    width: 100%;
+    padding: 12px;
+    background-color: #667eea;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 30px;
+}
+
+.form-box button.submits:hover {
+    background-color: #6271be;
+}
 input {
     margin-bottom: 30px;
     width: 100%;
@@ -178,7 +291,7 @@ body.login-page {
 }
 
 .login-btn:hover {
-    background-color: #5a6fd6;
+    background-color: #6271be;
 }
 
 /* Register link footer */
@@ -346,4 +459,151 @@ body.change-password-page {
 
 .show-pass-btn {
     margin-bottom: 20px;
+}
+
+/* Dish Registration */
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    border: 2px solid #333;
+    padding: 100px;
+    background: #fff;
+}
+
+.form-container h2 {
+    color: #0066cc;
+    margin-top: 01;
+}
+
+.instruction {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+
+.form-main-layout {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.form-fields {
+    flex: 2;
+}
+
+.form-group {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-group label {
+    font-weight: bold;
+    flex: 1;
+}
+.form-group select {
+    flex: 2;
+    padding: 6px;
+    margin-top: 0px;
+    border: 1px solid #4a90e2;
+    border-radius: 3px;
+
+}
+.form-group input {
+    flex: 2;
+    padding: 6px;
+    margin-top: 30px;
+    border: 1px solid #4a90e2;
+    border-radius: 3px;
+}
+
+.health-section {
+    margin: 15px 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.health-section ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+.health-section li {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.health-section li label {
+    font-weight: normal;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.health-section li input, .health-section li select {
+    padding: 4px;
+    border: 1px solid #4a90e2;
+    border-radius: 3px;
+    margin-top: 0px;
+    margin-bottom: 1px;
+    width: 180px;
+}
+
+/* Right Side Image Block */
+.image-upload-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.image-preview-box {
+    width: 150px;
+    height: 150px;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #666;
+    overflow: hidden;
+}
+
+.upload-btn, .btn-add, .btn-discard {
+    padding: 8px 15px;
+    border: 1px solid #333;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.upload-btn {
+    background-color: #f0f0f0;
+    border-color: #4a90e2;
+}
+
+.form-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.btn-add {
+    background-color: #e6f7ff;
+    color: #0066cc;
+    border-color: #4a90e2;
+}
+
+.btn-discard {
+    background-color: #fff;
+    color: red;
+    border-color: #ccc;
 }
