@@ -222,8 +222,36 @@ def create_dish():
   # Close the connection
     conn.close()
     return render_template("dishpage.html", dishes=dishes)
+  
+def get_dish_from_db():
+  # Connect to SQLite database
+  conn = sqlite3.connect("dish_database.db")
+  conn.row_factory = sqlite3.Row
+  cursor = conn.cursor()
+
+  # Fetch the first dish
+  cursor.execute("SELECT * FROM dishes WHERE id = 1")
+  dish = cursor.fetchone()
+  conn.close()
+  return dish
 
 
+@app.route("/dish_view", methods=["GET", "POST"])
+def dish_view():
+
+    conn = sqlite3.connect("dish_database.db")
+    conn.row_factory = (sqlite3.Row) 
+    cursor = conn.cursor()
+    try:
+        # Try to fetch all dishes from the table
+        cursor.execute("SELECT * FROM dishes")
+        dishes = cursor.fetchall()  # Grab all rows
+    except sqlite3.OperationalError:
+        # If the table doesn't exist yet, set dishes to an empty list
+        dishes = []
+
+    conn.close()
+    return render_template("dishpage.html", dishes=dishes)
 
 if __name__ == "__main__":
     app.run(debug=True)
