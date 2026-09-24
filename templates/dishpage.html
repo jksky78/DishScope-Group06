@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dish View Page</title>
+
+    <link rel="stylesheet" href="../static/css/dishpage.css">
+</head>
+
+<body>
+
+    <h1>4. Dish View page</h1>
+
+    <div class="page">
+
+        <!-- Top section -->
+        <div class="top-section">
+
+            <input 
+                type="text"
+                id="searchbar" 
+                class="search-bar" 
+                placeholder="Search bar: (type here)"
+            >
+
+            <div class="controls">
+
+    <select id="filterSelect">
+        <option value="all">Filter:</option>
+        <option value="main">Main Dish</option>
+        <option value="side">Side Dish</option>
+    </select>
+
+
+    <select id="sortSelect">
+        <option value="default">Sort by:</option>
+        <option value="priceLow">Lowest Price</option>
+        <option value="priceHigh">Highest Price</option>
+        <option value="ratingLow">Lowest Rating</option>
+        <option value="ratingHigh">Highest Rating</option>
+    </select>
+
+    </div>
+
+            <!-- Profile icon -->
+            <div class="profile">
+                <div class="head"></div>
+                <div class="body"></div>
+            </div>
+
+        </div>
+
+    <!-- Header section with your menu dropdown -->
+    <header class="navbar">
+        <div class="logo">DishScope</div>
+        <nav class="nav-menu">
+            <div class="dropdown">
+                <button class="dropbtn">Menu ▼</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('home') }}">Home</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-content">
+        
+
+        <!-- The Grid Container that loops through all SQLite dishes -->
+        <div class="dish-container">
+            {% for dish in dishes %}
+            <div class="dish-card">
+                <!-- Dish Picture Preview -->
+                <div class="dish-picture">
+                    {% if dish['image_filename'] %}
+                        <img src="{{ url_for('static', filename='uploads/' + dish['image_filename']) }}" alt="{{ dish['name'] }}" style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                        Picture
+                    {% endif %}
+                </div>
+
+                <!-- Database Columns injected dynamically -->
+                <h2>{{ dish['name'] }}</h2>
+                <p><b>Category:</b> {{ dish['category'] }}</p>
+                <p><b>Price:</b> RM {{ dish['price'] }}</p>
+                <p><b>Description:</b> {{ dish['description'] }}</p>
+                <p><b>Calories:</b> {{ dish['calories'] }} kcal</p>
+                <p><b>Vegetarian:</b> {{ dish['vegetarian'] }}</p>
+                <p><b>Spicy Level:</b> {{ dish['spicy_level'] }}</p>
+                <p><b>Availability:</b> {{ dish['availability'] }}</p>
+            </div>
+            {% else %}
+                <p>No dishes found in the database yet!</p>
+            {% endfor %}
+        </div>
+
+    </main>
+    <script src="../static/javascript/index.js"></script>
+</body>
+</html>
