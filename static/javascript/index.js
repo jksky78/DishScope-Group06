@@ -1,0 +1,202 @@
+var button= document.getElementById('button')
+
+function Vendor() {
+    button.style.left = '115px'
+    document.getElementById("vendor_inputs").style.display = "block";
+    document.getElementById("role").value = "vendor";
+}
+
+function Student() {
+    button.style.left = '0px'
+    document.getElementById("vendor_inputs").style.display = "none";
+    document.getElementById("role").value = "student";
+}
+
+function showPassword() {
+    let password = document.getElementById("password");
+
+    if (password.type === "password") {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+}
+
+function showPassword_New() {
+    let password = document.getElementById("new_password");
+
+    if (password.type === "password") {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+}
+
+function showPassword_Confirm() {
+    let password = document.getElementById("confirm_password");
+
+    if (password.type === "password") {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+}
+
+
+const searchBar = document.getElementById("searchbar");
+const filterSelect = document.getElementById("filterSelect");
+const sortSelect = document.getElementById("sortSelect");
+
+const dishContainer = document.getElementById("dishContainer");
+
+
+// Get all dish cards
+let dishCards = Array.from(
+    document.querySelectorAll(".dish-card")
+);
+
+
+// ================================
+// SEARCH
+// ================================
+
+searchBar.addEventListener("input", function () {
+    updateDishes();
+});
+
+
+// ================================
+// FILTER
+// ================================
+
+filterSelect.addEventListener("change", function () {
+    updateDishes();
+});
+
+
+// ================================
+// SORT
+// ================================
+
+sortSelect.addEventListener("change", function () {
+    updateDishes();
+});
+
+
+// ================================
+// MAIN FUNCTION
+// ================================
+
+function updateDishes() {
+
+    const searchText = searchBar.value.toLowerCase().trim();
+
+    const selectedFilter = filterSelect.value;
+
+    const selectedSort = sortSelect.value;
+
+
+    // --------------------------------
+    // FILTER
+    // --------------------------------
+
+    dishCards.forEach(function (card) {
+
+        const dishInformation =
+            card.textContent.toLowerCase();
+
+        const category =
+            card.dataset.category;
+
+
+        let matchesSearch =
+            dishInformation.includes(searchText);
+
+
+        let matchesFilter = true;
+
+
+        if (selectedFilter !== "all") {
+
+            matchesFilter =
+                category === selectedFilter;
+
+        }
+
+
+        // Show or hide card
+
+        if (matchesSearch && matchesFilter) {
+
+            card.style.display = "";
+
+        } else {
+
+            card.style.display = "none";
+
+        }
+
+    });
+
+
+    // --------------------------------
+    // SORT
+    // --------------------------------
+
+    if (selectedSort === "priceLow") {
+
+        dishCards.sort(function (a, b) {
+
+            return Number(a.dataset.price) -
+                   Number(b.dataset.price);
+
+        });
+
+    }
+
+
+    else if (selectedSort === "priceHigh") {
+
+        dishCards.sort(function (a, b) {
+
+            return Number(b.dataset.price) -
+                   Number(a.dataset.price);
+
+        });
+
+    }
+
+
+    else if (selectedSort === "ratingLow") {
+
+        dishCards.sort(function (a, b) {
+
+            return Number(a.dataset.rating) -
+                   Number(b.dataset.rating);
+
+        });
+
+    }
+
+
+    else if (selectedSort === "ratingHigh") {
+
+        dishCards.sort(function (a, b) {
+
+            return Number(b.dataset.rating) -
+                   Number(a.dataset.rating);
+
+        });
+
+    }
+
+
+    // Put cards back into the container
+
+    dishCards.forEach(function (card) {
+
+        dishContainer.appendChild(card);
+
+    });
+
+}
