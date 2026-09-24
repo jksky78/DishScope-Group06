@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="../static/css/style.css">
     <header>
         <h1>DishScope</h1>
+        <nav class="nav-menu">
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▼</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('add_dish') }}">Add Dish</a>
+            </div>
+        </div>
+    </nav>
     </header>
 </head>
 <body>
@@ -23,41 +32,42 @@
                 <button type="button" class="toggle_button" onclick="Vendor()">Vendor</button>
             </div>
             </div>
-            <input type="hidden" name="role" id="role" value="student">
+            <input type="hidden" name="role" id="role" value="student" >
             <label>
             Username
-            <input type="text" name ="name" value="{{ table_username }}">
+            <input type="text" name ="name" value="{{ table_username }}" required placeholder="Enter your username">
         </label>
         {% if error_name %}
             <p class="error-message">{{ error_name }}</p>
         {% endif %}
-        <label>
-            Password
-            <input type="password" name="password">
-        </label>
-        {% if error_pass %}
-            <p class="error-message">{{ error_pass }}</p>
-        {% endif %}
-        <label>
+                <label>
             Email
-            <input type="email" name="email">
+            <input type="email" name="email" required placeholder="Enter your email">
         </label>
         {% if error_email %}
             <p class="error-message">{{ error_email }}</p>
         {% endif %}
+        <label>
+            Password
+            <input type="password" name="password" required placeholder="Enter your password">
+        </label>
+        
+        {% if error_pass %}
+            <p class="error-message">{{ error_pass }}</p>
+        {% endif %}
         <div id="vendor_inputs" style="display: none;">
             <label>
                 Vendor name
-                <input type="text" name="vendor_name">
+                <input type="text" name="vendor_name" id ="vendor_name_input" required placeholder="Enter your vendor name">
             </label>
             <label>
                 Vendor location
-                <input type="text" name="vendor_location">
+                <input type="text" name="vendor_location" id = "vendor_location_input" required placeholder="Enter your vendor location">
             </label>
 
         </div>
-        <button type="submit">Confirm</button>
-        <p class="helper">Already has an account? <a href="{{ url_for('login') }}">Login</a></p>
+        <button type="submit" class="submits">Confirm</button>
+        <p class="helper">Already has an account? <a href="{{ url_for('login') }}">Log in</a></p>
         </div>
 
     </form>

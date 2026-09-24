@@ -212,14 +212,14 @@ def create_dish():
     conn = sqlite3.connect("dish_database.db")
     conn.row_factory = (
       sqlite3.Row
-  )  # This lets you use column names like dish['name']
+  ) 
     cursor = conn.cursor()
 
-  # 2. Fetch all dishes from the table
+  # Fetch all dishes from the table
     cursor.execute("SELECT * FROM dishes")
     dishes = cursor.fetchall()  # Grab all rows
 
-  # 3. Close the connection
+  # Close the connection
     conn.close()
     return render_template("dishpage.html", dishes=dishes)
 
