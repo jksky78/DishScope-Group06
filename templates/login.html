@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="../static/css/style.css">
     <header>
         <h1>DishScope</h1>
+        <nav class="nav-menu">
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▼</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('add_dish') }}">Add Dish</a>
+            </div>
+        </div>
+    </nav>
     </header>
 </head>
 <body>
