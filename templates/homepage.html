@@ -13,7 +13,16 @@
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
                 <a href="{{ url_for('home') }}">Home</a>
-                <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                {% if session.get('logged_in') %}
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                {% endif %}
+                <!-- check if the logged-in user is a student -->
+                {% if session.get('role') == 'student' %}
+                    <a href="{{ url_for('reset-password') }}">Student Dashboard</a>
+                {% endif %}
+                
             </div>
         </div>
     </nav>

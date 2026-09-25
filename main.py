@@ -75,30 +75,43 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-
+        
         connection = sqlite3.connect('test.db')
         cursor = connection.cursor()
-
+        users = cursor.fetchone()
         table_username = (request.form.get("name",) or "").strip()
         table_password = (request.form.get("password") or "").strip()
-
+        table_email = request.form.get("email")
         sql = "SELECT * FROM users WHERE name = ? AND password = ?"
         cursor.execute(sql, (table_username, table_password))
-
         result = cursor.fetchone()
         print("Entered username:", table_username)
         print("Entered password:", table_password)
         print("Result:", result)
 
+        
         if result:
+            
             print("Login successful!")
-            return render_template("dishpage.html")
+            if users and users[2] == table_password:     
+                print("IF STATEMENT REACHED")
+                session['logged_in'] = True
+                session['user_id'] = users[0]     
+                session['role'] = 'student'
+                print("SESSION:", session)         
+            return redirect(url_for('dish_view'))
         else:
             print("Invalid username or password!")
 
         connection.close()
 
     return render_template("login.html")
+
+@app.route('/logout', methods=["GET", "POST"])
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
+
 
 @app.route("/verify-email", methods=["GET", "POST"])
 def verify_email():
