@@ -59,7 +59,9 @@
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
                 <a href="{{ url_for('home') }}">Home</a>
-                <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                {% if session.get('role') == 'vendor' %}
+                    <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                {% endif %}
                 <a href="{{ url_for('logout') }}">Log out</a>
             </div>
         </div>

@@ -18,9 +18,8 @@
                 {% else %}
                     <a href="{{ url_for('login') }}">Login</a>
                 {% endif %}
-                <!-- check if the logged-in user is a student -->
-                {% if session.get('role') == 'student' %}
-                    <a href="{{ url_for('reset-password') }}">Student Dashboard</a>
+                {% if session.get('role') == 'vendor' %}
+                    <a href="{{ url_for('add_dish') }}">Student Dashboard</a>
                 {% endif %}
                 
             </div>
