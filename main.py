@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session 
+from flask import Flask, render_template, request, redirect, url_for, session , flash
 from itsdangerous import URLSafeSerializer
 from werkzeug.security import check_password_hash
 import sqlite3
@@ -78,7 +78,6 @@ def login():
         
         connection = sqlite3.connect('test.db')
         cursor = connection.cursor()
-        users = cursor.fetchone()
         table_username = (request.form.get("name",) or "").strip()
         table_password = (request.form.get("password") or "").strip()
         table_email = request.form.get("email")
@@ -88,22 +87,20 @@ def login():
         print("Entered username:", table_username)
         print("Entered password:", table_password)
         print("Result:", result)
-
+        connection.commit()
+        connection.close()
         
         if result:
-            
-            print("Login successful!")
-            if users and users[2] == table_password:     
-                print("IF STATEMENT REACHED")
-                session['logged_in'] = True
-                session['user_id'] = users[0]     
-                session['role'] = 'student'
-                print("SESSION:", session)         
+            print("Login successful!")   
+            session['logged_in'] = True
+            session['user_id'] = result[0]     
+            session['role'] = 'student'
+            print("SESSION:", session)         
             return redirect(url_for('dish_view'))
         else:
             print("Invalid username or password!")
-
-        connection.close()
+            return render_template('login.html', error="Invalid username or password!")
+       
 
     return render_template("login.html")
 
