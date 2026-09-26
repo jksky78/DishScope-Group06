@@ -12,7 +12,6 @@
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
                 <a href="{{ url_for('home') }}">Home</a>
-                <a href="{{ url_for('add_dish') }}">Add Dish</a>
             </div>
         </div>
     </nav>
@@ -23,6 +22,9 @@
     <div class="login-container">
         <h2>Login Here</h2>
         <form method="POST" action="/login">
+            {% if error %}
+                <p style="color: red; font-weight: bold;">{{ error }}</p>
+            {% endif %}
             <div class="input-group">
                 <label for="username">Username or Email</label>
                 <input type="text" id="username" name="name" required placeholder="Enter your username">

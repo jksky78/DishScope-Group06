@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session 
+from flask import Flask, render_template, request, redirect, url_for, session , flash
 from itsdangerous import URLSafeSerializer
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 
 
@@ -10,6 +10,7 @@ app.secret_key = "DishScope-000"
 @app.get("/")
 def home ():
     if request.method == 'GET':
+        print(session)
         return render_template("homepage.html")
 
 @app.route("/register", methods=["GET", "POST"])
@@ -32,14 +33,13 @@ def register():
         input_insert = "insert into users(name, password, email, role) values(?, ?, ?, ?)"
         name = request.form['name']
         password = request.form['password']
+        hashed_password = generate_password_hash(password)
         email = request.form['email']
         table_username = request.form.get("name", "").strip()
         table_password = (request.form.get("password",) or "").strip()
         table_email = request.form.get("email")
         table_vendor_name = request.form.get("vendor_name")
         table_vendor_location = request.form.get("vendor_location")
-
-                
 
         if not table_username:
             error_name = "Username is required"
@@ -52,7 +52,7 @@ def register():
             return render_template("register.html", table_username=table_username, table_password=table_password, error_email=error_email)
         else:
             cursor.execute(table)
-            cursor.execute(input_insert, (table_username, password, email, role))
+            cursor.execute(input_insert, (table_username, hashed_password, email, role))
             connection.commit()
             if role == "vendor":
                 vendor_table = '''create table if not exists vendors(
@@ -68,6 +68,7 @@ def register():
             connection.commit()
             connection.close()
             return f'Hello, {name}'
+    
 
 
     return render_template('register.html')
@@ -75,30 +76,39 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-
+        
         connection = sqlite3.connect('test.db')
         cursor = connection.cursor()
-
         table_username = (request.form.get("name",) or "").strip()
         table_password = (request.form.get("password") or "").strip()
-
-        sql = "SELECT * FROM users WHERE name = ? AND password = ?"
-        cursor.execute(sql, (table_username, table_password))
-
+        table_email = request.form.get("email")
+        sql = "SELECT id, name, password, role FROM users WHERE name = ?"
+        cursor.execute(sql, (table_username,))
         result = cursor.fetchone()
         print("Entered username:", table_username)
         print("Entered password:", table_password)
         print("Result:", result)
 
-        if result:
-            print("Login successful!")
-            return render_template("dishpage.html")
+        
+        if result and check_password_hash(result[2], table_password):
+            print("Login successful!")   
+            session["logged_in"] = True
+            session["user"] = result[1]
+            session['user_id'] = result[0]     
+            session['role'] = 'student'
+            print("SESSION:", session)         
+            return redirect(url_for('dish_view'))
         else:
             print("Invalid username or password!")
-
-        connection.close()
-
+            return render_template('login.html', error="Invalid username or password!")
+        
     return render_template("login.html")
+
+@app.route('/logout', methods=["GET", "POST"])
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
+
 
 @app.route("/verify-email", methods=["GET", "POST"])
 def verify_email():
@@ -238,17 +248,23 @@ def get_dish_from_db():
 
 @app.route("/dish_view", methods=["GET", "POST"])
 def dish_view():
-
-    conn = sqlite3.connect("dish_database.db")
-    conn.row_factory = (sqlite3.Row) 
-    cursor = conn.cursor()
-    try:
+    if "logged_in" in  session:
+        print(session)
+        conn = sqlite3.connect("dish_database.db")
+        conn.row_factory = (sqlite3.Row) 
+        cursor = conn.cursor()
+        try:
         # Try to fetch all dishes from the table
-        cursor.execute("SELECT * FROM dishes")
-        dishes = cursor.fetchall()  # Grab all rows
-    except sqlite3.OperationalError:
+            cursor.execute("SELECT * FROM dishes")
+            dishes = cursor.fetchall()  # Grab all rows
+        except sqlite3.OperationalError:
         # If the table doesn't exist yet, set dishes to an empty list
-        dishes = []
+            dishes = []
+    else:
+        print("You dont have access to this page")
+        flash('You must be logged in to view that page.', 'danger')
+        return redirect(url_for('home', error="You do not have access to this page, please log in"))
+        
 
     conn.close()
     return render_template("dishpage.html", dishes=dishes)
