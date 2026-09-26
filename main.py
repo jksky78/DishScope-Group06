@@ -82,7 +82,7 @@ def login():
         table_username = (request.form.get("name",) or "").strip()
         table_password = (request.form.get("password") or "").strip()
         table_email = request.form.get("email")
-        sql = "SELECT id, name, password_hash, role FROM users WHERE name = ?"
+        sql = "SELECT id, name, password, role FROM users WHERE name = ?"
         cursor.execute(sql, (table_username,))
         result = cursor.fetchone()
         print("Entered username:", table_username)
