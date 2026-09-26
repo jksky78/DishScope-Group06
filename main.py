@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session , flash
 from itsdangerous import URLSafeSerializer
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 
 
@@ -33,14 +33,13 @@ def register():
         input_insert = "insert into users(name, password, email, role) values(?, ?, ?, ?)"
         name = request.form['name']
         password = request.form['password']
+        hashed_password = generate_password_hash(password)
         email = request.form['email']
         table_username = request.form.get("name", "").strip()
         table_password = (request.form.get("password",) or "").strip()
         table_email = request.form.get("email")
         table_vendor_name = request.form.get("vendor_name")
         table_vendor_location = request.form.get("vendor_location")
-
-                
 
         if not table_username:
             error_name = "Username is required"
@@ -53,7 +52,7 @@ def register():
             return render_template("register.html", table_username=table_username, table_password=table_password, error_email=error_email)
         else:
             cursor.execute(table)
-            cursor.execute(input_insert, (table_username, password, email, role))
+            cursor.execute(input_insert, (table_username, hashed_password, email, role))
             connection.commit()
             if role == "vendor":
                 vendor_table = '''create table if not exists vendors(
@@ -69,6 +68,7 @@ def register():
             connection.commit()
             connection.close()
             return f'Hello, {name}'
+    
 
 
     return render_template('register.html')
@@ -82,15 +82,15 @@ def login():
         table_username = (request.form.get("name",) or "").strip()
         table_password = (request.form.get("password") or "").strip()
         table_email = request.form.get("email")
-        sql = "SELECT * FROM users WHERE name = ? AND password = ?"
-        cursor.execute(sql, (table_username, table_password))
+        sql = "SELECT id, name, password_hash, role FROM users WHERE name = ?"
+        cursor.execute(sql, (table_username,))
         result = cursor.fetchone()
         print("Entered username:", table_username)
         print("Entered password:", table_password)
         print("Result:", result)
 
         
-        if result:
+        if result and check_password_hash(result[2], table_password):
             print("Login successful!")   
             session["logged_in"] = True
             session["user"] = result[1]
