@@ -45,6 +45,9 @@ header {
     position: relative;
 }
 
+.alert-danger {
+    color: rgb(239, 22, 22);
+}
 /* Dropdown Button */
 .dropbtn {
     background-color: transparent;

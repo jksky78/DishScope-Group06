@@ -7,12 +7,14 @@
     <link rel="stylesheet" href="../static/css/style.css">
     <header>
         <h1>DishScope</h1>
+        
         <nav class="nav-menu">
         </div>
         <div class="dropdown">
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
                 <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('dish_view') }}">Dish View</a>
                 {% if session.get('logged_in') %}
                     <a href="{{ url_for('logout') }}">Logout</a>
                 {% else %}
@@ -28,6 +30,15 @@
     </header>
 </head>
 <body>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert-danger">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
     <form action="/register" method="GET">
     <button type="submit" class="submit-btn">Register here</button>
 </form>

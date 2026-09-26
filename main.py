@@ -10,6 +10,7 @@ app.secret_key = "DishScope-000"
 @app.get("/")
 def home ():
     if request.method == 'GET':
+        print(session)
         return render_template("homepage.html")
 
 @app.route("/register", methods=["GET", "POST"])
@@ -87,12 +88,12 @@ def login():
         print("Entered username:", table_username)
         print("Entered password:", table_password)
         print("Result:", result)
-        connection.commit()
-        connection.close()
+
         
         if result:
             print("Login successful!")   
-            session['logged_in'] = True
+            session["logged_in"] = True
+            session["user"] = result[1]
             session['user_id'] = result[0]     
             session['role'] = 'student'
             print("SESSION:", session)         
@@ -100,8 +101,7 @@ def login():
         else:
             print("Invalid username or password!")
             return render_template('login.html', error="Invalid username or password!")
-       
-
+        
     return render_template("login.html")
 
 @app.route('/logout', methods=["GET", "POST"])
@@ -248,17 +248,23 @@ def get_dish_from_db():
 
 @app.route("/dish_view", methods=["GET", "POST"])
 def dish_view():
-
-    conn = sqlite3.connect("dish_database.db")
-    conn.row_factory = (sqlite3.Row) 
-    cursor = conn.cursor()
-    try:
+    if "logged_in" in  session:
+        print(session)
+        conn = sqlite3.connect("dish_database.db")
+        conn.row_factory = (sqlite3.Row) 
+        cursor = conn.cursor()
+        try:
         # Try to fetch all dishes from the table
-        cursor.execute("SELECT * FROM dishes")
-        dishes = cursor.fetchall()  # Grab all rows
-    except sqlite3.OperationalError:
+            cursor.execute("SELECT * FROM dishes")
+            dishes = cursor.fetchall()  # Grab all rows
+        except sqlite3.OperationalError:
         # If the table doesn't exist yet, set dishes to an empty list
-        dishes = []
+            dishes = []
+    else:
+        print("You dont have access to this page")
+        flash('You must be logged in to view that page.', 'danger')
+        return redirect(url_for('home', error="You do not have access to this page, please log in"))
+        
 
     conn.close()
     return render_template("dishpage.html", dishes=dishes)
