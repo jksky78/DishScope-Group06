@@ -12,6 +12,26 @@ def home ():
     if request.method == 'GET':
         print(session)
         return render_template("homepage.html")
+def init_db():
+    # connects to  database (and creates the file if it doesn't exist yet)
+    conn = sqlite3.connect('test.db')
+    cursor = conn.cursor()
+    
+    # CREATE TABLE IF NOT EXISTS
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+               ID integer primary key autoincrement,
+                name text not null,
+                password text not null,
+                email text not null,
+                role text not null
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
+
+init_db()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
