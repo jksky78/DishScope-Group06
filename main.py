@@ -1,11 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for, session , flash
+from flask import Flask, render_template, request, redirect, url_for, session , flash, jsonify
 from itsdangerous import URLSafeSerializer
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
+import os
 import sqlite3
 
 
 app = Flask(__name__)
 app.secret_key = "DishScope-000"
+UPLOAD_FOLDER = 'static/img'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.get("/")
 def home ():
@@ -197,6 +201,18 @@ def reset_password():
 def add_dish():
     return render_template("dish-registration.html")
 
+@app.route("/upload-image", methods=["POST"])
+def upload():
+    file = request.files['file']
+    if file:
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        return jsonify({
+            'message': 'Image uploaded successfully!', 
+            'filename': filename
+        }), 200
+    
 
 @app.route("/create_dish", methods=["GET", "POST"])
 def create_dish():

@@ -244,3 +244,38 @@ sortSelect.addEventListener("change", function () {
     console.log("Selected:", sortSelect.value);
     updateDishes();
 });
+
+
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+    const output = document.getElementById('preview');
+    output.src = reader.result;
+    output.style.display = 'block';
+    document.getElementById('preview-text').style.display = 'none';
+        };
+    reader.readAsDataURL(event.target.files[0]);
+        }
+function clearPreview() {
+    document.getElementById('preview').style.display = 'none';
+    document.getElementById('preview-text').style.display = 'block';
+        }
+
+
+async function processAndUpload() {
+    const fileInput = document.getElementById('imageInput');
+    if (!fileInput.files[0]) return alert("Please select an image first!");
+
+    // Package the file into FormData
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    const response = await fetch('/upload-image', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        alert(data.message); // Shows success message from Python
+
+    }
