@@ -71,6 +71,8 @@
         <!-- The Grid Container that loops through all SQLite dishes -->
         <div class="dish-container">
             {% for dish in dishes %}
+            <a href="{{ url_for('dish_detail', dish_id=dish['id']) }}"
+               class="dish-link">
             <div class="dish-card">
                 <!-- Dish Picture Preview -->
                 <div class="dish-picture">
@@ -91,6 +93,7 @@
                 <p><b>Spicy Level:</b> {{ dish['spicy_level'] }}</p>
                 <p><b>Availability:</b> {{ dish['availability'] }}</p>
             </div>
+            </a>
             {% else %}
                 <p>No dishes found in the database yet!</p>
             {% endfor %}
