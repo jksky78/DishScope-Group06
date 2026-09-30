@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{{ dish['name'] }}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dish_detail.css') }}">
+
+</head>
+
+
+<body>
+
+    <div class="page">
+
+        <!-- BACK BUTTON -->
+
+        <a href="{{ url_for('home') }}" class="back-button">
+            ← Back to dishes
+        </a>
+
+
+        <!-- DISH TITLE -->
+
+        <h1>{{ dish['name'] }}</h1>
+
+
+        <!-- DISH IMAGE -->
+
+        <div class="dish-image">
+
+            {% if dish['image_filename'] %}
+
+                <img
+                    src="{{ url_for('static', filename='uploads/' + dish['image_filename']) }}"
+                    alt="{{ dish['name'] }}"
+                >
+
+            {% else %}
+
+                <div class="no-image">
+                    Picture
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- BASIC INFORMATION -->
+
+        <div class="basic-info">
+
+            <p>
+                <b>Category:</b>
+                {{ dish['category'] }}
+            </p>
+
+            <p>
+                <b>Price:</b>
+                RM {{ dish['price'] }}
+            </p>
+
+            <p>
+                <b>Vendor:</b>
+                {{ dish['vendor_name'] if dish['vendor_name'] else "Ali's Kitchen" }}
+            </p>
+
+            <p>
+                <b>Availability:</b>
+                {{ dish['availability'] }}
+            </p>
+
+        </div>
+
+
+        <!-- ==================================
+             1. DESCRIPTION
+        =================================== -->
+
+        <section class="detail-section">
+
+            <h2>1. Description</h2>
+
+            <p>
+                {{ dish['description'] }}
+            </p>
+
+        </section>
+
+
+        <!-- ==================================
+             2. HEALTH INFORMATION
+        =================================== -->
+
+        <section class="detail-section">
+
+            <h2>2. Health Information</h2>
+
+            <div class="health-grid">
+
+                <div class="health-item">
+
+                    <h3>Calories</h3>
+
+                    <p>
+                        {{ dish['calories'] }} kcal
+                    </p>
+
+                </div>
+
+
+                <div class="health-item">
+
+                    <h3>Vegetarian</h3>
+
+                    <p>
+                        {{ dish['vegetarian'] }}
+                    </p>
+
+                </div>
+
+
+                <div class="health-item">
+
+                    <h3>Spicy Level</h3>
+
+                    <p>
+                        {{ dish['spicy_level'] }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
