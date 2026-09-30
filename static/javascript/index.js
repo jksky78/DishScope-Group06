@@ -262,20 +262,3 @@ function clearPreview() {
         }
 
 
-async function processAndUpload() {
-    const fileInput = document.getElementById('imageInput');
-    if (!fileInput.files[0]) return alert("Please select an image first!");
-
-    // Package the file into FormData
-    const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
-
-    const response = await fetch('/upload-image', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        alert(data.message); // Shows success message from Python
-
-    }

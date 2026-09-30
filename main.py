@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session , flash, jsonify
 from itsdangerous import URLSafeSerializer
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 import os
 import uuid
@@ -11,6 +12,7 @@ app = Flask(__name__)
 app.secret_key = "DishScope-000"
 UPLOAD_FOLDER = 'static/img'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
 @app.get("/")
 def home ():
@@ -207,14 +209,6 @@ def upload():
     file = request.files['file']
     if file:
         filename = secure_filename(file.filename)
-        unique_filename = f"{uuid.uuid4()}_{filename}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-        file.save(filepath)
-        db_path = f"/{filepath}"
-        conn = sqlite3.connect('dish_database.db')
-        conn.execute("INSERT INTO dishes (image_filename) VALUES (?)", (db_path,))
-        conn.commit()
-        
         return jsonify({
             'message': 'Image uploaded successfully!', 
             'filename': filename
@@ -226,6 +220,11 @@ def upload():
 def create_dish():
   if request.method == "POST":
     conn = sqlite3.connect("dish_database.db")
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+    unique_filename = f"{uuid.uuid4()}_{filename}"
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+    file.save(filepath)
     cursor = conn.cursor()
     cursor.execute("""
             CREATE TABLE IF NOT EXISTS dishes (
@@ -255,14 +254,17 @@ def create_dish():
     allergens = request.form.get("allergens")
     availability = request.form.get("availability")
 
+
     # Handle image filename if uploaded
     image_filename = ""
     if "image" in request.files:
         file = request.files["image"]
         if file.filename != "":
             image_filename = file.filename
-    cursor.execute(input_insert_dish, (name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, image_filename))
+    cursor.execute(input_insert_dish, (name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, unique_filename))
+    print(unique_filename)
     conn.commit()
+    conn.close()
     conn = sqlite3.connect("dish_database.db")
     conn.row_factory = (
       sqlite3.Row
@@ -276,6 +278,7 @@ def create_dish():
   # Close the connection
     conn.close()
     return render_template("dishpage.html", dishes=dishes)
+
   
 def get_dish_from_db():
   # Connect to SQLite database
@@ -312,8 +315,15 @@ def dish_view():
         return redirect(url_for('home', error="You do not have access to this page, please log in"))
         
     if dishes:
-        print(dishes[0])
+        print(dishes[0]['image_filename'])
         return render_template("dishpage.html", dishes=dishes)
+    conn.commit()
+    conn.close()
+
+@app.errorhandler(413)
+def too_large(e):
+    # Flash a friendly message (requires a secret_key set on your app)
+    return render_template('dish-registration.html', error="The uploaded image is too large! Please choose an image under 5MB."), 413
 
 if __name__ == "__main__":
     app.run(debug=True)

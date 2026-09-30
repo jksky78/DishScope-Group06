@@ -21,6 +21,11 @@
 <body>
 
     <div class="form-container">
+        {% if error %}
+            <div class="alert alert-danger" style="color: red; background: #ffe6e6; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                {{ error }}
+            </div>
+        {% endif %}
         <h2>Add new dish</h2>
         <p class="instruction">Your Dish (Type in empty box or select fixed option):</p>
         
@@ -38,7 +43,7 @@
 
                     <div class="form-group">
                         <label>Category:</label>
-                        <input type="text" name="category">
+                        <input type="text" name="category" required>
                     </div>
 
                     <div class="form-group">
@@ -100,8 +105,9 @@
                             <img id="preview" src="" alt="Image preview" style="display:none; max-width:100%; max-height:100%;">
                             <span id="preview-text">Image preview</span>
                         </div>
-                        <input type="file" name="image" id="imageInput" accept="image/*"  onchange="previewImage(event)">
-                        <button type="button"  class="upload-btn" onclick="processAndUpload()">Upload Image</button>
+                        <input type="file" name="file" id="imageInput" required accept="image/*" style="display: none;"  onchange="previewImage(event)">
+                        <button type="button"  class="upload-btn" onclick="document.getElementById('imageInput').click()">Upload Image</button>
+                        <p>*File must not exceed 5 MB</p>
                         
 
 
