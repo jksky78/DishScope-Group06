@@ -77,10 +77,11 @@
             <div class="dish-card" data-rating="{{ dish['rating'] }}" data-price="{{ dish['price'] }}" >
                 <!-- Dish Picture Preview -->
                 <div class="dish-picture">
-                    {% if dish['image_filename'] %}
-                        <img src="{{ url_for('static', filename='uploads/' + dish['image_filename']) }}" alt="{{ dish['name'] }}" style="width:100%; height:100%; object-fit:cover;">
+                    {% if image_filename %}
+                        <!-- Flask automatically serves files out of the 'static' folder using this path -->
+                    <img src="{{ image_filename }}" alt="Uploaded Profile Picture" width="300" style="border-radius: 8px;">
                     {% else %}
-                        Picture
+                        <p>No profile picture available.</p>
                     {% endif %}
                 </div>
 

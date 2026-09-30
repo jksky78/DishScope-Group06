@@ -3,6 +3,7 @@ from itsdangerous import URLSafeSerializer
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 import os
+import uuid
 import sqlite3
 
 
@@ -206,12 +207,19 @@ def upload():
     file = request.files['file']
     if file:
         filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        unique_filename = f"{uuid.uuid4()}_{filename}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
         file.save(filepath)
+        db_path = f"/{filepath}"
+        conn = sqlite3.connect('dish_database.db')
+        conn.execute("INSERT INTO dishes (image_filename) VALUES (?)", (db_path,))
+        conn.commit()
+        
         return jsonify({
             'message': 'Image uploaded successfully!', 
             'filename': filename
         }), 200
+        
     
 
 @app.route("/create_dish", methods=["GET", "POST"])
@@ -293,7 +301,9 @@ def dish_view():
         # Try to fetch all dishes from the table
             cursor.execute("SELECT * FROM dishes")
             dishes = cursor.fetchall()  # Grab all rows
+            print("ALL DISHES FOUND:", dishes)
         except sqlite3.OperationalError:
+            print("DATABASE ERROR:")
         # If the table doesn't exist yet, set dishes to an empty list
             dishes = []
     else:
@@ -301,9 +311,9 @@ def dish_view():
         flash('You must be logged in to view that page.', 'danger')
         return redirect(url_for('home', error="You do not have access to this page, please log in"))
         
-
-    conn.close()
-    return render_template("dishpage.html", dishes=dishes)
+    if dishes:
+        print(dishes[0])
+        return render_template("dishpage.html", dishes=dishes)
 
 if __name__ == "__main__":
     app.run(debug=True)
