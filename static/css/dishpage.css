@@ -208,7 +208,7 @@ header {
 /* Picture placeholder */
 .dish-picture {
     width: 100%;
-    height: 45px;
+    height: 280px;
 
     background-color: #eeeeee;
 
@@ -217,10 +217,16 @@ header {
     justify-content: center;
 
     margin-bottom: 5px;
-
+    overflow: hidden;
     color: #777;
 }
 
+/* Image inside picture container */
+.dish-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
 /* Dish name */
 .dish-card h2 {
