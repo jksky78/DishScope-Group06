@@ -2,15 +2,40 @@ var button= document.getElementById('button')
 
 function Vendor() {
     button.style.left = '115px'
-    document.getElementById("vendor_inputs").style.display = "block";
     document.getElementById("role").value = "vendor";
+    const vName = document.getElementById("vendor_name_input")
+    const vLocation = document.getElementById("vendor_location_input")
+    const role = document.getElementById("role").value
+
+    if (role == "vendor") {
+        vName.required = true
+        vLocation.required = true
+        document.getElementById("vendor_inputs").style.display = "block";
+    }
+    else {
+        vName.required = false
+        vLocation.required = false 
+    }
 }
 
 function Student() {
     button.style.left = '0px'
     document.getElementById("vendor_inputs").style.display = "none";
     document.getElementById("role").value = "student";
+    const vName = document.getElementById("vendor_name_input")
+    const vLocation = document.getElementById("vendor_location_input")
+    const role = document.getElementById("role")
+
+    if (role === "vendor") {
+        vName.required = true
+        vLocation.required = true
+    }
+    else {
+        vName.required = false
+        vLocation.required = false 
+    }
 }
+
 
 function showPassword() {
     let password = document.getElementById("password");
@@ -44,16 +69,36 @@ function showPassword_Confirm() {
 
 
 const searchBar = document.getElementById("searchbar");
+
+const dishContainer = document.getElementById("dishContainer");
+const dishCards = Array.from(document.querySelectorAll(".dish-card"));
 const filterSelect = document.getElementById("filterSelect");
 const sortSelect = document.getElementById("sortSelect");
 
-const dishContainer = document.getElementById("dishContainer");
+searchBar.addEventListener("input", function () {
+
+    const searchText = searchBar.value.toLowerCase().trim();
+
+    dishCards.forEach(function (card) {
+
+        const dishInformation = card.textContent.toLowerCase();
+
+        if (dishInformation.includes(searchText)) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+
+    });
+
+});
+
+
+
+
 
 
 // Get all dish cards
-let dishCards = Array.from(
-    document.querySelectorAll(".dish-card")
-);
 
 
 // ================================
@@ -143,6 +188,7 @@ function updateDishes() {
     // SORT
     // --------------------------------
 
+
     if (selectedSort === "priceLow") {
 
         dishCards.sort(function (a, b) {
@@ -200,3 +246,11 @@ function updateDishes() {
     });
 
 }
+
+
+sortSelect.addEventListener("change", function () {
+    console.log("Selected:", sortSelect.value);
+    updateDishes();
+});
+
+

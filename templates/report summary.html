@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Summary (Vendor Only)</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f9f9f9;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    h1 {
+        font-size: 22px;
+        color: #333;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 12px;
+        margin: 0 0 20px;
+    }
+
+    /* ---------- buttons ---------- */
+    .btn-primary, button {
+        padding: 8px 16px;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 13px;
+        display: inline-block;
+        font-family: inherit;
+        font-weight: bold;
+    }
+    .btn-primary:hover, button:hover { background: #0056b3; }
+    .btn-success { background: #28a745; }
+    .btn-success:hover { background: #218838; }
+
+    .header-actions {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    /* ---------- vendor bar ---------- */
+    .vendor-bar {
+        background: #f1f8ff;
+        border: 1px solid #cce5ff;
+        border-radius: 6px;
+        padding: 12px 18px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .vendor-bar label {
+        font-weight: bold;
+        font-size: 14px;
+        color: #004085;
+    }
+    .vendor-bar select {
+        padding: 8px 12px;
+        border: 1px solid #b8daff;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: inherit;
+        background: #fff;
+        min-width: 200px;
+        cursor: pointer;
+    }
+
+    /* ---------- summary boxes ---------- */
+    .summary-section { margin-bottom: 30px; }
+    .section-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 0 0 12px;
+        color: #333;
+    }
+
+    .summary-boxes { display: flex; gap: 20px; flex-wrap: wrap; }
+    .summary-box {
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 12px 18px;
+        min-width: 260px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        background: #fff;
+    }
+    .summary-label { font-size: 13px; color: #333; }
+    .summary-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    /* ---------- main grid ---------- */
+    .report-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        align-items: start;
+    }
+    @media (max-width: 900px) {
+        .report-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---------- left column: dish cards ---------- */
+    .left-col {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .card-section-title {
+        font-size: 15px;
+        color: #333;
+        margin: 0 0 10px;
+        font-weight: normal;
+    }
+
+    .dish-card-vendor {
+        border: 1px solid #4472c4;
+        border-radius: 4px;
+        padding: 14px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        background: #fff;
+        margin-bottom: 10px;
+    }
+
+    .dish-card-vendor img {
+        width: 90px;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 4px;
+        background: #eee;
+        flex-shrink: 0;
+    }
+
+    .dish-details {
+        font-size: 13px;
+        line-height: 1.6;
+        color: #333;
+    }
+    .dish-details p { margin: 0 0 4px; }
+    .dish-details strong { color: #333; font-weight: bold; }
+    .dish-details .avail-yes { color: #28a745; font-weight: bold; }
+    .dish-details .avail-no { color: #dc3545; font-weight: bold; }
+
+    .ratings-line {
+        margin-top: 12px;
+        font-size: 14px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .stars {
+        color: #f5b342;
+        font-size: 22px;
+        letter-spacing: 2px;
+    }
+
+    /* ---------- right column: chart ---------- */
+    .chart-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        background: #fff;
+    }
+
+    .chart-title {
+        font-size: 15px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin: 0 0 20px;
+    }
+
+    .chart-body {
+        display: flex;
+        height: 220px;
+        gap: 8px;
+    }
+
+    .y-axis-title {
+        width: 14px;
+        flex-shrink: 0;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        text-align: center;
+        font-size: 11px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .y-axis {
+        position: relative;
+        width: 30px;
+        flex-shrink: 0;
+    }
+    .y-axis span {
+        position: absolute;
+        right: 0;
+        transform: translateY(50%);
+        font-size: 11px;
+        color: #666;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .plot {
+        position: relative;
+        flex: 1;
+        border-left: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        min-width: 0;
+    }
+    .gridline {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 0;
+        border-top: 1px solid #edf0f3;
+    }
+
+    .bars {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        padding: 0 10px;
+    }
+    .bar-col {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        min-width: 0;
+        position: relative;
+    }
+    .bar {
+        width: 100%;
+        max-width: 50px;
+        background: #4472c4;
+        border-radius: 2px 2px 0 0;
+        min-height: 2px;
+        position: relative;
+    }
+    .bar-label {
+        position: absolute;
+        top: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .x-axis-labels {
+        display: flex;
+        gap: 12px;
+        padding: 0 10px;
+        margin-top: 6px;
+    }
+    .x-label {
+        flex: 1;
+        min-width: 0;
+        text-align: center;
+        font-size: 11px;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .x-axis-title {
+        text-align: center;
+        font-size: 11px;
+        color: #666;
+        margin-top: 8px;
+        padding-left: 46px;
+    }
+
+    .empty-note {
+        text-align: center;
+        color: #999;
+        padding: 30px 10px;
+        font-style: italic;
+        font-size: 13px;
+    }
+
+    .back-link {
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+    .back-link a {
+        color: #007bff;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    .back-link a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Report Summary (Vendor only)</h1>
+
+    <div class="header-actions">
+        <a href="menu management.html" class="btn-primary">← Back to Menu</a>
+        <a href="review rating.html" class="btn-primary btn-success">View Reviews Dashboard</a>
+    </div>
+
+    <!-- ============================================================
+         VENDOR FILTER
+         ============================================================ -->
+    <div class="vendor-bar">
+        <label for="vendorSelector">Vendor:</label>
+        <select id="vendorSelector" onchange="onVendorChange()"></select>
+    </div>
+
+    <!-- ============================================================
+         REPORT SUMMARY BOXES
+         ============================================================ -->
+    <div class="summary-section">
+        <h2 class="section-title">Report summary:</h2>
+        <div class="summary-boxes">
+            <div class="summary-box">
+                <span class="summary-label">Total dish created:</span>
+                <span class="summary-value" id="totalDishes">0</span>
+            </div>
+            <div class="summary-box">
+                <span class="summary-label">Total review from dish created:</span>
+                <span class="summary-value" id="totalReviews">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MAIN GRID (CARDS + CHART)
+         ============================================================ -->
+    <div class="report-grid">
+
+        <!-- Left Column: Highest Rated & Most Reviewed -->
+        <div class="left-col">
+            <!-- Highest Rated -->
+            <div>
+                <h3 class="card-section-title">Your Highest rated dish</h3>
+                <div id="highestRatedBox"></div>
+                <div class="ratings-line">
+                    Ratings: <span class="stars" id="highestStars">☆☆☆☆☆</span>
+                </div>
+            </div>
+
+            <!-- Most Reviewed -->
+            <div>
+                <h3 class="card-section-title">Your Most reviewed dish:</h3>
+                <div id="mostReviewedBox"></div>
+            </div>
+        </div>
+
+        <!-- Right Column: Chart -->
+        <div class="chart-card">
+            <h3 class="chart-title">Top 5 most reviewed dishes</h3>
+            <div id="chartBox"></div>
+        </div>
+
+    </div>
+
+    <div class="back-link">
+        <a href="review rating.html">Go back Dish Viewing page</a>
+    </div>
+
+</div>
+
+<script>
+    /* ============================================================
+       STORAGE KEYS
+       ============================================================ */
+    var DISH_KEY   = 'menuDraft';
+    var REVIEW_KEY = 'dishReviews';
+
+    /* ============================================================
+       VENDOR CONFIGURATION
+       Add any vendor names you expect to see here.
+       They will always appear in the dropdown, even with 0 dishes.
+       ============================================================ */
+    var KNOWN_VENDORS = [
+        'Chicken Delight',
+        'Bella Italia',
+        'Sushi House',
+        'Green Bowl',
+        'Tandoori Nights'
+    ];
+
+    var FALLBACK_DISHES = [
+        { id: '1', name: 'Margherita Pizza', category: 'Main', price: 14.99, vendor: 'Chicken Delight', available: true, image: 'https://via.placeholder.com/150' },
+        { id: '2', name: 'Tiramisu', category: 'Dessert', price: 8.25, vendor: 'Bella Italia', available: false, image: 'https://via.placeholder.com/150' },
+        { id: '3', name: 'Spicy Chicken Bowl', category: 'Appetizer', price: 8.25, vendor: 'Chicken Delight', available: true, image: 'https://via.placeholder.com/150' },
+        { id: '4', name: 'Butter Chicken', category: 'Main', price: 12.50, vendor: 'Chicken Delight', available: true, image: 'https://via.placeholder.com/150' },
+        { id: '5', name: 'Rice Chicken', category: 'Main', price: 6.00, vendor: 'Chicken Delight', available: true, image: 'https://via.placeholder.com/150' }
+    ];
+
+    var currentVendor = '';
+
+    /* ============================================================
+       LOAD DATA
+       ============================================================ */
+    function loadDishes() {
+        var stored = localStorage.getItem(DISH_KEY);
+        if (stored) {
+            try {
+                var parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            } catch (e) {}
+        }
+        localStorage.setItem(DISH_KEY, JSON.stringify(FALLBACK_DISHES));
+        return FALLBACK_DISHES.slice();
+    }
+
+    function loadReviews() {
+        var stored = localStorage.getItem(REVIEW_KEY);
+        if (stored) {
+            try {
+                var parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) return parsed;
+            } catch (e) {}
+        }
+        return [];
+    }
+
+    /* ============================================================
+       POPULATE VENDOR DROPDOWN
+       ============================================================ */
+    function populateVendorDropdown() {
+        var dishes = loadDishes();
+
+        // 1. Collect vendors that actually appear on dishes
+        var fromData = [];
+        dishes.forEach(function (d) {
+            if (d.vendor && fromData.indexOf(d.vendor) === -1) {
+                fromData.push(d.vendor);
+            }
+        });
+
+        // 2. Merge: KNOWN_VENDORS first, then any extras found in data
+        var vendors = KNOWN_VENDORS.slice();
+        fromData.forEach(function (v) {
+            if (vendors.indexOf(v) === -1) vendors.push(v);
+        });
+
+        var selector = document.getElementById('vendorSelector');
+        selector.innerHTML = '';
+
+        if (vendors.length === 0) {
+            selector.innerHTML = '<option value="">No vendors</option>';
+            currentVendor = '';
+            return;
+        }
+
+        // 3. Add "All Vendors" option at the top
+        var allOpt = document.createElement('option');
+        allOpt.value = '__ALL__';
+        allOpt.textContent = 'All Vendors';
+        selector.appendChild(allOpt);
+
+        vendors.forEach(function (v) {
+            var opt = document.createElement('option');
+            opt.value = v;
+            opt.textContent = v;
+            selector.appendChild(opt);
+        });
+
+        // 4. Keep current selection if still valid, else default to first real vendor
+        var stillValid = vendors.indexOf(currentVendor) !== -1 || currentVendor === '__ALL__';
+        if (!stillValid) {
+            currentVendor = vendors[0];
+        }
+        selector.value = currentVendor;
+    }
+
+    function onVendorChange() {
+        currentVendor = document.getElementById('vendorSelector').value;
+        render();
+    }
+
+    /* ============================================================
+       COMPUTE STATISTICS
+       ============================================================ */
+    function computeStats() {
+        var allDishes = loadDishes();
+        var allReviews = loadReviews();
+
+        // Filter by selected vendor (or show all)
+        var dishes = (currentVendor === '__ALL__')
+            ? allDishes.slice()
+            : allDishes.filter(function (d) {
+                  return d.vendor === currentVendor;
+              });
+
+        var dishIds = dishes.map(function (d) { return String(d.id); });
+        var reviews = allReviews.filter(function (r) {
+            return dishIds.indexOf(String(r.dishId)) !== -1;
+        });
+
+        var dishStats = dishes.map(function (d) {
+            var own = reviews.filter(function (r) {
+                return String(r.dishId) === String(d.id);
+            });
+            var sum = 0;
+            own.forEach(function (r) { sum += Number(r.rating) || 0; });
+            return {
+                dish:  d,
+                count: own.length,
+                avg:   own.length ? sum / own.length : 0
+            };
+        });
+
+        var totalReviews = 0;
+        dishStats.forEach(function (s) { totalReviews += s.count; });
+
+        return {
+            dishes:       dishes,
+            dishStats:    dishStats,
+            totalDishes:  dishes.length,
+            totalReviews: totalReviews
+        };
+    }
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    function esc(str) {
+        if (str == null) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function starsFor(rating) {
+        var rounded = Math.round(rating);
+        var out = '';
+        for (var i = 1; i <= 5; i++) out += (i <= rounded) ? '★' : '☆';
+        return out;
+    }
+
+    /* ============================================================
+       RENDER: DISH MINI CARD (VENDOR VIEW)
+       ============================================================ */
+    function dishBoxHtml(dish) {
+        var img   = dish.image || 'https://via.placeholder.com/150';
+        var price = parseFloat(dish.price) || 0;
+        var avail = dish.available ? '<span class="avail-yes">Yes</span>' : '<span class="avail-no">No</span>';
+
+        return '' +
+            '<div class="dish-card-vendor">' +
+                '<img src="' + esc(img) + '" alt="' + esc(dish.name) + '">' +
+                '<div class="dish-details">' +
+                    '<p><strong>Dish Name:</strong> ' + esc(dish.name) + '</p>' +
+                    '<p><strong>Category:</strong> ' + esc(dish.category || '-') + '</p>' +
+                    '<p><strong>Price:</strong> RM ' + price.toFixed(2) + '</p>' +
+                    '<p><strong>Availability:</strong> ' + avail + '</p>' +
+                '</div>' +
+            '</div>';
+    }
+
+    /* ============================================================
+       RENDER: TOP 5 BAR CHART
+       ============================================================ */
+    function renderChart(top) {
+        var box = document.getElementById('chartBox');
+
+        if (!top.length) {
+            box.innerHTML = '<p class="empty-note">No reviews yet for this vendor.</p>';
+            return;
+        }
+
+        // Dynamic scaling: find max count, determine nice max for y-axis
+        var maxCount = top[0].count;
+        var niceMax;
+        if (maxCount <= 1) niceMax = 4;
+        else if (maxCount <= 4) niceMax = 4;
+        else if (maxCount <= 8) niceMax = 8;
+        else if (maxCount <= 12) niceMax = 12;
+        else if (maxCount <= 16) niceMax = 16;
+        else if (maxCount <= 20) niceMax = 20;
+        else niceMax = Math.ceil(maxCount / 20) * 20;
+
+        // Y-axis ticks: 0, niceMax/4, niceMax/2, 3*niceMax/4, niceMax
+        var ticks = [0, niceMax * 0.25, niceMax * 0.5, niceMax * 0.75, niceMax];
+
+        // Build y-axis labels + gridlines
+        var yHtml = '', gridHtml = '';
+        ticks.forEach(function (v) {
+            var pct = (v / niceMax) * 100;
+            yHtml    += '<span style="bottom:' + pct + '%">' + v + '</span>';
+            gridHtml += '<div class="gridline" style="bottom:' + pct + '%"></div>';
+        });
+
+        // Build bars + x labels
+        var barsHtml = '', xHtml = '';
+        top.forEach(function (s) {
+            var h = (s.count / niceMax) * 100;
+            barsHtml +=
+                '<div class="bar-col">' +
+                    '<div class="bar" style="height:' + h + '%">' +
+                        '<span class="bar-label">' + s.count + '</span>' +
+                    '</div>' +
+                '</div>';
+            xHtml +=
+                '<div class="x-label" title="' + esc(s.dish.name) + '">' +
+                    esc(s.dish.name) +
+                '</div>';
+        });
+
+        box.innerHTML =
+            '<div class="chart-body">' +
+                '<div class="y-axis-title">Total Review</div>' +
+                '<div class="y-axis">' + yHtml + '</div>' +
+                '<div class="plot">' + gridHtml +
+                    '<div class="bars">' + barsHtml + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="x-axis-labels">' + xHtml + '</div>' +
+            '<div class="x-axis-title">Dish Name</div>';
+    }
+
+    /* ============================================================
+       RENDER EVERYTHING
+       ============================================================ */
+    function render() {
+        var stats = computeStats();
+
+        /* --- summary boxes --- */
+        document.getElementById('totalDishes').textContent  = stats.totalDishes;
+        document.getElementById('totalReviews').textContent = stats.totalReviews;
+
+        /* --- highest rated (only dishes that have at least 1 review) --- */
+        var rated = stats.dishStats.filter(function (s) { return s.count > 0; });
+        var highest = null;
+        rated.forEach(function (s) {
+            if (!highest) { highest = s; return; }
+            if (s.avg > highest.avg + 1e-9) {
+                highest = s;
+            } else if (Math.abs(s.avg - highest.avg) < 1e-9 && s.count > highest.count) {
+                highest = s;
+            }
+        });
+
+        var highestBox  = document.getElementById('highestRatedBox');
+        var highestStar = document.getElementById('highestStars');
+
+        if (highest) {
+            highestBox.innerHTML = dishBoxHtml(highest.dish);
+            highestStar.textContent = starsFor(highest.avg);
+        } else {
+            highestBox.innerHTML    = '<p class="empty-note">No ratings yet.</p>';
+            highestStar.textContent = '☆☆☆☆☆';
+        }
+
+        /* --- most reviewed --- */
+        var most = null;
+        stats.dishStats.forEach(function (s) {
+            if (!most || s.count > most.count) most = s;
+        });
+        if (most && most.count === 0) most = null;
+
+        document.getElementById('mostReviewedBox').innerHTML =
+            most ? dishBoxHtml(most.dish)
+                 : '<p class="empty-note">No reviews yet.</p>';
+
+        /* --- top 5 chart --- */
+        var top = stats.dishStats
+            .filter(function (s) { return s.count > 0; })
+            .sort(function (a, b) {
+                return b.count - a.count || a.dish.name.localeCompare(b.dish.name);
+            })
+            .slice(0, 5);
+
+        renderChart(top);
+    }
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    function init() {
+        populateVendorDropdown();
+        render();
+    }
+
+    init();
+
+    /* keep the report live if the menu / reviews change in another tab */
+    window.addEventListener('storage', function (e) {
+        if (e.key === DISH_KEY || e.key === REVIEW_KEY) {
+            populateVendorDropdown();
+            render();
+        }
+    });
+</script>
+
+</body>
+</html>
