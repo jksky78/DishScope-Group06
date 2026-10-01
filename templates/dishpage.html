@@ -34,10 +34,10 @@
     </select>
     </div>
             <!-- Profile icon -->
-             <a href="{{ url_for('home') }}" style="display: block; width: fit-content;">
-                            <div class="profile">
-                <div class="head"></div>
-                <div class="body"></div>
+             <a href="{{ url_for('profile') }}" style="display: block; width: fit-content; text-decoration: none;">
+                <div class="avatar">
+                    {{ user['name'][0] | upper }}
+
             </div>
 
              </a>
@@ -50,9 +50,11 @@
         <div class="dropdown">
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
-                <a href="{{ url_for('home') }}">Home</a>
+
+
                 {% if session.get('role') == 'vendor' %}
                     <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                    <a href="{{ url_for('menu_management') }}">Menu Management</a>
                 {% endif %}
                 <a href="{{ url_for('logout') }}">Log out</a>
             </div>

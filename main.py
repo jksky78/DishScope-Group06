@@ -109,18 +109,27 @@ def register():
         else:
             cursor.execute(table)
             cursor.execute(input_insert, (table_username, hashed_password, email, role))
+
+            new_user_id = cursor.lastrowid
             connection.commit()
             if role == "vendor":
+                if table_vendor_name.isdigit() or not table_vendor_name:
+                    error_vendor = "Vendor name cannot be only numbers."
+                    return render_template("register.html", error_vendor=error_vendor)
+        
+                if table_vendor_location.isdigit() or not table_vendor_location:
+                    error_vendor = "Vendor location cannot be only numbers."
+                    return render_template("register.html", error_vendor=error_vendor)
                 vendor_table = '''create table if not exists vendors(
-                ID integer primary key autoincrement,
+                ID integer primary key,
                 name text not null,
                 vendor_name text not null,
                 vendor_location text not null,
                 role text not null
         )'''
-                input_insert_vendor = "insert into vendors(name, vendor_name, vendor_location, role) values(?, ?, ?, ?)"
+                input_insert_vendor = "insert into vendors(ID, name, vendor_name, vendor_location, role) values(?, ?, ?, ?, ?)"
                 cursor.execute(vendor_table)
-                cursor.execute(input_insert_vendor, (table_username, table_vendor_name, table_vendor_location, role))
+                cursor.execute(input_insert_vendor, (new_user_id, table_username, table_vendor_name, table_vendor_location, role))
             connection.commit()
             connection.close()
             conn = sqlite3.connect('dish_database.db')
@@ -132,7 +141,7 @@ def register():
 
             # Close the connection
             conn.close()
-            return render_template("dishpage.html", dishes=dishes)
+            return render_template("homepage.html")
     
 
 
@@ -341,6 +350,16 @@ def get_dish_from_db():
 def dish_view():
     if "logged_in" in  session:
         print(session)
+        # 1. Get user_id from session FIRST
+        user_id = session.get('user_id')
+    
+    # 2. Connect to users database ('test.db') and fetch user
+        conn_users = sqlite3.connect("test.db")
+        conn_users.row_factory = sqlite3.Row
+        cursor_users = conn_users.cursor()
+    
+        user = cursor_users.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+        conn_users.close()  # Close when done
         conn = sqlite3.connect("dish_database.db")
         conn.row_factory = (sqlite3.Row) 
         cursor = conn.cursor()
@@ -356,7 +375,7 @@ def dish_view():
         if dishes:
             print(dishes[0]['image_filename'])
         
-        return render_template("dishpage.html", dishes=dishes)
+        return render_template("dishpage.html", dishes=dishes, user=user)
     else:
         print("You dont have access to this page")
         flash('You must be logged in to view that page.', 'danger')
@@ -374,6 +393,49 @@ def too_large(e):
 @app.route("/menu management", methods=["GET", "POST"])
 def menu_management():
         return render_template("menu management.html")
+
+@app.route("/dish_detail", methods=["GET", "POST"])
+def dish_detail():
+        return render_template("dish detailed dashboard.html")
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    conn = sqlite3.connect("test.db")
+    conn.row_factory = (sqlite3.Row)
+    cursor = conn.cursor()
+    user_id = session.get('user_id')
+# 1. HANDLE POST (When user clicks Save/Submit)
+    if request.method == "POST":
+        new_name = request.form.get('name')
+    
+        if session.get('role') == 'student':
+        # Update user table only
+            cursor.execute('UPDATE users SET name = ? WHERE id = ?', (new_name, user_id))
+        
+        elif session.get('role') == 'vendor':
+            print("if reached")
+            new_vendor_name = request.form.get('vendor_name')
+            new_vendor_location = request.form.get('vendor_location')
+            cursor.execute('UPDATE users SET name = ? WHERE id = ?', (new_name, user_id))
+            cursor.execute('UPDATE vendors SET name = ?, vendor_name = ?, vendor_location = ? WHERE id = ?', 
+                       (new_name, new_vendor_name, new_vendor_location, user_id))
+        
+   
+        conn.commit()
+        conn.close()
+        
+        # Refresh the page to show updated info
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for('profile'))
+    user = cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    print(session['user_id'])
+    if session['role'] == "vendor":
+        vendor = cursor.execute('SELECT * FROM vendors WHERE id = ?', (user_id,)).fetchone()
+    else:
+        vendor = None
+    return render_template('profile.html', user=user, vendor=vendor)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 

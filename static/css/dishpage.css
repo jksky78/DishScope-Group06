@@ -143,16 +143,25 @@ header {
 
 
 /* Profile icon */
-.profile {
+.avatar {
+    width: 80px;
+    height: 80px;
+    background-color: #4A90E2;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
     position: absolute;
     right: 15px;
     top: 10px;
-
     width: 80px;
     height: 80px;
-
-    background-color: #e5e5e5;
-    border-radius: 50%;
+    border-radius: 50%; /* Makes it a perfect circle */
+    right: 15px;
+    top: 10px;
+    align-items: center;
+    justify-content: center;
 }
 
 
