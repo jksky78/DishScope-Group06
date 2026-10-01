@@ -15,16 +15,15 @@
             <div class="dropdown-content">
                 <a href="{{ url_for('home') }}">Home</a>
                 <a href="{{ url_for('dish_view') }}">Dish View</a>
+                <a href="{{ url_for('menu_management') }}">Menu Management</a>
                 {% if session.get('logged_in') %}
                     <a href="{{ url_for('logout') }}">Logout</a>
                 {% else %}
                     <a href="{{ url_for('login') }}">Login</a>
-                    <a href="{{ url_for('add_dish') }}">Student Dashboard</a>
                 {% endif %}
                 {% if session.get('role') == 'vendor' %}
-                    <a href="{{ url_for('add_dish') }}">Student Dashboard</a>
+                    <a href="{{ url_for('add_dish') }}">Add Dish</a>
                 {% endif %}
-                
             </div>
         </div>
     </nav>
