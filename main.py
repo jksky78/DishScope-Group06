@@ -433,6 +433,15 @@ def dish_detail(dish_id):
         # Fetch specific dish info using the passed IDs
         dish = cursor.execute('SELECT * FROM dishes WHERE id = ?', (dish_id,)).fetchone()
         reviews = cursor.execute('SELECT * FROM reviews WHERE dish_id = ? ORDER BY id DESC', (dish_id,)).fetchall()
+        # 3. Calculate total reviews and average rating using SQLite built-in functions
+        stats = cursor.execute('''
+            SELECT COUNT(*) as total, AVG(rating) as average 
+            FROM reviews WHERE dish_id = ?
+        ''', (dish_id,)).fetchone()
+    
+        total_reviews = stats['total'] if stats['total'] else 0
+        # Round average to 1 decimal place (e.g., 3.3), default to 0 if no reviews
+        avg_rating = round(stats['average'], 1) if stats['average'] else 0.0
         conn.close()
         # 2. Connect to users/vendors database (test.db) using the dish's vendor_id
         conn_users = sqlite3.connect("test.db")
@@ -446,7 +455,7 @@ def dish_detail(dish_id):
         conn_users.close()
     
     # 3. Pass both 'dish' and 'vendor' to the template
-        return render_template("dish detailed dashboard.html", dish=dish, vendor=vendor, reviews=reviews)
+        return render_template("dish detailed dashboard.html", dish=dish, vendor=vendor, reviews=reviews, total_reviews=total_reviews, avg_rating=avg_rating)
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
@@ -523,7 +532,6 @@ def add_review(dish_id):
     reviews = cursor.execute('SELECT * FROM reviews WHERE dish_id = ? ORDER BY id DESC', (dish_id,)).fetchall()
     conn.commit()
     conn.close()
-    flash("Review posted successfully!", "success")
     print("SUCCESS")
     return redirect(url_for('dish_detail', dish_id=dish_id, reviews=reviews))
 
