@@ -73,7 +73,10 @@
                 <div class="dish-picture">
                     {% if dish["image_filename"] %}
                         <!-- Flask automatically serves files out of the 'static' folder using this path -->
-                    <img src="{{ url_for('static', filename='img/' + dish['image_filename']) }}" alt="Uploaded Profile Picture" width="300" style="border-radius: 8px;">
+                    <a href="{{ url_for('dish_detail', dish_id=dish['id']) }}">
+                        <img src="{{ url_for('static', filename='img/' + dish['image_filename']) }}" alt="Uploaded Profile Picture" width="300" style="border-radius: 8px;">
+
+                    </a> 
                     {% else %}
                         <p>No profile picture available.</p>
                     {% endif %}
