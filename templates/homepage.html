@@ -20,10 +20,6 @@
                 {% else %}
                     <a href="{{ url_for('login') }}">Login</a>
                 {% endif %}
-                {% if session.get('role') == 'vendor' %}
-                    <a href="{{ url_for('menu_management') }}">Menu Management</a>
-                    <a href="{{ url_for('add_dish') }}">Add Dish</a>
-                {% endif %}
             </div>
         </div>
     </nav>

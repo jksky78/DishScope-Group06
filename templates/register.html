@@ -20,6 +20,9 @@
 <body>
     <form method="POST" action="/register">
         <div class="form-box">
+            {% if error_vendor %}
+                <p style="color: red; background: #ffe6e6; padding: 10px; margin-bottom: 15px; border-radius: 5px;">{{ error_vendor }}</p>
+            {% endif %}
             <h1>Sign up</h1>
             <label class="role">
             Which role are you?

@@ -113,6 +113,13 @@ def register():
             new_user_id = cursor.lastrowid
             connection.commit()
             if role == "vendor":
+                if table_vendor_name.isdigit() or not table_vendor_name:
+                    error_vendor = "Vendor name cannot be only numbers."
+                    return render_template("register.html", error_vendor=error_vendor)
+        
+                if table_vendor_location.isdigit() or not table_vendor_location:
+                    error_vendor = "Vendor location cannot be only numbers."
+                    return render_template("register.html", error_vendor=error_vendor)
                 vendor_table = '''create table if not exists vendors(
                 ID integer primary key,
                 name text not null,
@@ -392,7 +399,11 @@ def profile():
     print(session['user_id'])
     if session['role'] == "vendor":
         vendor = cursor.execute('SELECT * FROM vendors WHERE id = ?', (user_id,)).fetchone()
-    return render_template('profile.html', user=user)
+    else:
+        vendor = None
+    return render_template('profile.html', user=user, vendor=vendor)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
