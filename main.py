@@ -404,7 +404,29 @@ def profile():
     conn.row_factory = (sqlite3.Row)
     cursor = conn.cursor()
     user_id = session.get('user_id')
+# 1. HANDLE POST (When user clicks Save/Submit)
+    if request.method == "POST":
+        new_name = request.form.get('name')
     
+        if session.get('role') == 'student':
+        # Update user table only
+            cursor.execute('UPDATE users SET name = ? WHERE id = ?', (new_name, user_id))
+        
+        elif session.get('role') == 'vendor':
+            print("if reached")
+            new_vendor_name = request.form.get('vendor_name')
+            new_vendor_location = request.form.get('vendor_location')
+            cursor.execute('UPDATE users SET name = ? WHERE id = ?', (new_name, user_id))
+            cursor.execute('UPDATE vendors SET name = ?, vendor_name = ?, vendor_location = ? WHERE id = ?', 
+                       (new_name, new_vendor_name, new_vendor_location, user_id))
+        
+   
+        conn.commit()
+        conn.close()
+        
+        # Refresh the page to show updated info
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for('profile'))
     user = cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
     print(session['user_id'])
     if session['role'] == "vendor":

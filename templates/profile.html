@@ -34,20 +34,29 @@
 <body>
     <h1 class="profile">Your Profile</h1>
     <h2 class="profile">Manage your profile information and preferences</h2>
-    
     <form method="POST" action="">
         <div class="form-box">
+            <!-- Flash Messages Block -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" style="padding: 10px; margin-bottom: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">
+            {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
             <div class="avatar">
                 {{ user['name'][0] | upper }}
             </div>
             <div class="field-group">
                         <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" value= "{{ user['name'] }}" required class="text-input">
+                        <input type="text" id="name" name="name" value= "{{ user['name'] }}" required class="text-input">
                     </div>
                     {% if session.get('role') == 'vendor' %}
                         <div id="role_vendor" class="field-group">
                             <label for="username">Your vendor name:</label>
-                            <input type="text" id="vendor_location" name="vendor_name" value= "{{ vendor['vendor_name'] }}" required class="text-input">
+                            <input type="text" id="vendor_name" name="vendor_name" value= "{{ vendor['vendor_name'] }}" required class="text-input">
                             <label for="username">Your vendor location:</label>
                             <input type="text" id="vendor_location" name="vendor_location" value= "{{ vendor['vendor_location'] }}" required class="text-input">
                         </div>
@@ -70,9 +79,9 @@
                             </div>
 
 
-
+            <button type="submit" class="submit-btn">Save changes</button>
         </div>
-
+        
     </form>
 
 </body>
