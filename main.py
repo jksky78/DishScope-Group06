@@ -109,18 +109,20 @@ def register():
         else:
             cursor.execute(table)
             cursor.execute(input_insert, (table_username, hashed_password, email, role))
+
+            new_user_id = cursor.lastrowid
             connection.commit()
             if role == "vendor":
                 vendor_table = '''create table if not exists vendors(
-                ID integer primary key autoincrement,
+                ID integer primary key,
                 name text not null,
                 vendor_name text not null,
                 vendor_location text not null,
                 role text not null
         )'''
-                input_insert_vendor = "insert into vendors(name, vendor_name, vendor_location, role) values(?, ?, ?, ?)"
+                input_insert_vendor = "insert into vendors(ID, name, vendor_name, vendor_location, role) values(?, ?, ?, ?, ?)"
                 cursor.execute(vendor_table)
-                cursor.execute(input_insert_vendor, (table_username, table_vendor_name, table_vendor_location, role))
+                cursor.execute(input_insert_vendor, (new_user_id, table_username, table_vendor_name, table_vendor_location, role))
             connection.commit()
             connection.close()
             conn = sqlite3.connect('dish_database.db')
@@ -132,7 +134,7 @@ def register():
 
             # Close the connection
             conn.close()
-            return render_template("dishpage.html", dishes=dishes)
+            return render_template("homepage.html")
     
 
 
@@ -374,6 +376,23 @@ def too_large(e):
 @app.route("/menu management", methods=["GET", "POST"])
 def menu_management():
         return render_template("menu management.html")
+
+@app.route("/dish_detail", methods=["GET", "POST"])
+def dish_detail():
+        return render_template("dish detailed dashboard.html")
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    conn = sqlite3.connect("test.db")
+    conn.row_factory = (sqlite3.Row)
+    cursor = conn.cursor()
+    user_id = session.get('user_id')
+    
+    user = cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    print(session['user_id'])
+    if session['role'] == "vendor":
+        vendor = cursor.execute('SELECT * FROM vendors WHERE id = ?', (user_id,)).fetchone()
+    return render_template('profile.html', user=user)
 if __name__ == "__main__":
     app.run(debug=True)
 
