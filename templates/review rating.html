@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detailed Dish Dashboard</title>
+    <style>
+        /* ============================================================
+           GLOBAL STYLES
+           ============================================================ */
+        * { box-sizing: border-box; margin: 0; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f9f9f9;
+            color: #333;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* --- buttons --- */
+        .btn-primary, button {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+            font-family: inherit;
+        }
+        .btn-primary:hover, button:hover { background: #0056b3; }
+        button.secondary { background: #6c757d; }
+        button.secondary:hover { background: #5a6268; }
+        button.success { background: #28a745; }
+        button.success:hover { background: #218838; }
+        button.danger { background: #dc3545; }
+        button.danger:hover { background: #a71d2a; }
+        button.small { padding: 5px 10px; font-size: 12px; }
+
+        .header-actions {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-links { display: flex; gap: 8px; }
+
+        /* ============================================================
+           DISH SELECTOR
+           ============================================================ */
+        .dish-selector-bar {
+            background: #f1f8ff;
+            border: 1px solid #cce5ff;
+            border-radius: 6px;
+            padding: 12px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .dish-selector-bar label {
+            font-weight: bold;
+            font-size: 14px;
+            color: #004085;
+        }
+        .dish-selector-bar select {
+            padding: 8px 12px;
+            border: 1px solid #b8daff;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #fff;
+            min-width: 250px;
+            cursor: pointer;
+        }
+
+        /* ============================================================
+           SUMMARY SECTION
+           ============================================================ */
+        .summary-panel {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 40px;
+            background: #fff;
+        }
+        @media (max-width: 768px) {
+            .summary-panel { flex-direction: column; gap: 20px; }
+        }
+
+        .overall-rating {
+            flex: 1;
+            text-align: center;
+            border-right: 1px solid #eee;
+            padding-right: 20px;
+        }
+        @media (max-width: 768px) {
+            .overall-rating { border-right: none; border-bottom: 1px solid #eee; padding-bottom: 20px; padding-right: 0; }
+        }
+        .overall-rating h2 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .overall-rating .big-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #212529;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .overall-rating .stars-large {
+            font-size: 28px;
+            color: #f5b342;
+            letter-spacing: 4px;
+        }
+
+        .rating-distribution { flex: 2; }
+        .rating-distribution h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: normal;
+        }
+        .rating-distribution h3 strong { font-size: 16px; }
+
+        .dist-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .dist-row .label {
+            width: 45px;
+            color: #495057;
+            flex-shrink: 0;
+            text-align: right;
+        }
+        .dist-row .track {
+            flex: 1;
+            height: 14px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .dist-row .fill {
+            height: 100%;
+            border-radius: 4px;
+            background: #007bff;
+            transition: width 0.25s ease;
+        }
+        .dist-row .fill.green { background: #28a745; }
+        .dist-row .fill.orange { background: #fd7e14; }
+        .dist-row .count {
+            width: 30px;
+            text-align: left;
+            font-weight: bold;
+            color: #495057;
+            font-size: 12px;
+        }
+
+        /* ============================================================
+           FILTER / SORT CONTROLS
+           ============================================================ */
+        .controls-panel {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .control-group label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .filter-placeholder {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #adb5bd;
+            font-style: italic;
+            font-size: 12px;
+        }
+        .filter-placeholder input,
+        .filter-placeholder select {
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+            background: #e9ecef;
+            color: #adb5bd;
+            pointer-events: none;
+            min-width: 140px;
+        }
+
+        /* ============================================================
+           REVIEWS SECTION
+           ============================================================ */
+        .reviews-section {
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .reviews-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 800px) {
+            .reviews-grid { grid-template-columns: 1fr; }
+        }
+
+        .review-card {
+            display: flex;
+            gap: 12px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fff;
+        }
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #6c757d;
+            font-size: 18px;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+        .review-content { flex: 1; min-width: 0; }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+        .review-header .username {
+            font-weight: bold;
+            font-size: 14px;
+            color: #212529;
+        }
+        .review-header .date {
+            font-size: 11px;
+            color: #adb5bd;
+        }
+        .review-stars {
+            color: #f5b342;
+            font-size: 14px;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        .review-comment {
+            font-size: 13px;
+            color: #495057;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        /* ============================================================
+           FOOTER LINK
+           ============================================================ */
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link a:hover { text-decoration: underline; }
+
+        /* ============================================================
+           EMPTY STATE / MESSAGES
+           ============================================================ */
+        .empty-note {
+            text-align: center;
+            color: #999;
+            padding: 30px 0;
+            font-style: italic;
+            font-size: 14px;
+        }
+        .form-message {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        .form-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        .form-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        /* ============================================================
+           WRITE REVIEW FORM
+           ============================================================ */
+        .write-review-section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px 18px;
+            margin-bottom: 24px;
+        }
+        .write-review-section h2 {
+            font-size: 16px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .form-group label {
+            width: 110px;
+            font-weight: bold;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .form-group textarea { min-height: 60px; }
+
+        .star-input {
+            display: flex;
+            gap: 4px;
+            user-select: none;
+        }
+        .star-input span {
+            font-size: 24px;
+            color: #ddd;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.1s;
+        }
+        .star-input span.active { color: #f5b342; }
+        .star-input span:hover { color: #f5b342; }
+
+        .review-form-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            padding-left: 110px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Detailed Dish Dashboard</h1>
+
+    <div class="header-actions">
+        <div class="nav-links">
+            <a href="menu management.html" class="btn-primary">← Back to Menu</a>
+            <a href="dish-registration.html" class="btn-primary" style="background:#28a745;">+ Add Dish</a>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         DISH SELECTOR
+         ============================================================ -->
+    <div class="dish-selector-bar">
+        <label for="dishSelector">Select Dish:</label>
+        <select id="dishSelector" onchange="onDishChange()"></select>
+    </div>
+
+    <!-- ============================================================
+         SUMMARY PANEL
+         ============================================================ -->
+    <div class="summary-panel" id="summaryPanel">
+        <div class="overall-rating">
+            <h2>Overall dish ratings</h2>
+            <div class="big-number" id="overallNumber">—</div>
+            <div class="stars-large" id="overallStars">☆☆☆☆☆</div>
+        </div>
+
+        <div class="rating-distribution">
+            <h3>Total reviews for <span id="selectedDishName">this dish</span>: <strong id="totalReviewsCount">0</strong></h3>
+            <div id="distributionBars"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         WRITE A REVIEW
+         ============================================================ -->
+    <div class="write-review-section">
+        <h2 id="reviewFormTitle">Write a review</h2>
+        <div id="formMessage" class="form-message"></div>
+        <form id="reviewForm" onsubmit="submitReview(event)">
+            <input type="hidden" id="reviewId">
+
+            <div class="form-group">
+                <label>Your name:</label>
+                <input type="text" id="reviewUser" placeholder="e.g. Alex" required maxlength="40">
+            </div>
+
+            <div class="form-group">
+                <label>Dish:</label>
+                <select id="reviewDish" required></select>
+            </div>
+
+            <div class="form-group">
+                <label>Rating:</label>
+                <div class="star-input" id="starInput">
+                    <span data-value="1">★</span>
+                    <span data-value="2">★</span>
+                    <span data-value="3">★</span>
+                    <span data-value="4">★</span>
+                    <span data-value="5">★</span>
+                </div>
+                <input type="hidden" id="reviewRating" required>
+            </div>
+
+            <div class="form-group" style="align-items: flex-start;">
+                <label style="padding-top:8px;">Comment:</label>
+                <textarea id="reviewComment" placeholder="How was the dish?" maxlength="300" required></textarea>
+            </div>
+
+            <div class="review-form-actions">
+                <button type="submit" class="success" id="submitBtn">Post review</button>
+                <button type="button" class="secondary" onclick="cancelEdit()" id="cancelBtn" style="display:none;">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ============================================================
+         REVIEWS SECTION
+         ============================================================ -->
+    <div class="reviews-section">
+        <h2>Reviews for <span id="reviewsDishName">this dish</span></h2>
+
+        <div class="controls-panel">
+            <div class="control-group">
+                <label>Filter:</label>
+                <div class="filter-placeholder">
+                    <input type="text" placeholder="Filter component..." disabled>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Sort by:</label>
+                <div class="filter-placeholder">
+                    <select disabled>
+                        <option>Sort component...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="reviews-grid" id="reviewsList">
+            <p class="empty-note">No reviews yet. Be the first to write one.</p>
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a href="menu management.html">Go back Dish Viewing page</a>
+    </div>
+
+</div>
+
+<script>
+    // ============================================================
+    // STORAGE KEYS
+    // ============================================================
+    var DISH_KEY = 'menuDraft';
+    var REVIEW_KEY = 'dishReviews';
+
+    var FALLBACK_DISHES = [
+        { id: '1', name: 'Margherita Pizza', category: 'Main', price: 14.99, vendor: 'Chicken Delight', available: true, description: 'Classic pizza with tomato and mozzarella', calories: '800', ingredients: 'Flour, Tomato, Mozzarella, Basil', vegetarian: 'Yes', spiciness: 'Not spicy', allergens: 'Gluten, Dairy', image: 'https://via.placeholder.com/150' },
+        { id: '2', name: 'Tiramisu', category: 'Dessert', price: 8.25, vendor: 'Bella Italia', available: false, description: 'Coffee-flavored Italian dessert', calories: '450', ingredients: 'Mascarpone, Coffee, Cocoa', vegetarian: 'Yes', spiciness: 'Not spicy', allergens: 'Dairy, Eggs', image: 'https://via.placeholder.com/150' }
+    ];
+
+    var currentRating = 0;
+    var selectedDishId = null;
+
+    // ============================================================
+    // LOAD / SAVE
+    // ============================================================
+    function loadDishes() {
+        var stored = localStorage.getItem(DISH_KEY);
+        if (stored) {
+            try {
+                var parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            } catch (e) {}
+        }
+        localStorage.setItem(DISH_KEY, JSON.stringify(FALLBACK_DISHES));
+        return FALLBACK_DISHES.slice();
+    }
+
+    function loadReviews() {
+        var stored = localStorage.getItem(REVIEW_KEY);
+        if (stored) {
+            try {
+                var parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) return parsed;
+            } catch (e) {}
+        }
+        return [];
+    }
+
+    function saveReviews(reviews) {
+        localStorage.setItem(REVIEW_KEY, JSON.stringify(reviews));
+    }
+
+    function getDishById(id) {
+        var dishes = loadDishes();
+        for (var i = 0; i < dishes.length; i++) {
+            if (dishes[i].id == id) return dishes[i];
+        }
+        return null;
+    }
+
+    // ============================================================
+    // TIME FORMAT
+    // ============================================================
+    function formatDate(iso) {
+        var d = new Date(iso);
+        var day = String(d.getDate()).padStart(2, '0');
+        var month = String(d.getMonth() + 1).padStart(2, '0');
+        var year = d.getFullYear();
+        return day + '/' + month + '/' + year;
+    }
+
+    // ============================================================
+    // STAR INPUT
+    // ============================================================
+    function initStarInput() {
+        var stars = document.querySelectorAll('#starInput span');
+        stars.forEach(function(star) {
+            star.addEventListener('mouseenter', function() {
+                paintStars(parseInt(star.dataset.value));
+            });
+            star.addEventListener('mouseleave', function() {
+                paintStars(currentRating);
+            });
+            star.addEventListener('click', function() {
+                currentRating = parseInt(star.dataset.value);
+                document.getElementById('reviewRating').value = currentRating;
+                paintStars(currentRating);
+            });
+        });
+    }
+
+    function paintStars(upTo) {
+        document.querySelectorAll('#starInput span').forEach(function(star) {
+            var v = parseInt(star.dataset.value);
+            star.classList.toggle('active', v <= upTo);
+        });
+    }
+
+    function resetStarInput() {
+        currentRating = 0;
+        document.getElementById('reviewRating').value = '';
+        paintStars(0);
+    }
+
+    // ============================================================
+    // POPULATE DROPDOWNS (once, on load)
+    // ============================================================
+    function populateDropdownsOnce() {
+        var dishes = loadDishes();
+
+        // Dashboard selector
+        var selector = document.getElementById('dishSelector');
+        selector.innerHTML = '';
+        dishes.forEach(function(d) {
+            var opt = document.createElement('option');
+            opt.value = d.id;
+            opt.textContent = d.name + ' (' + (d.vendor || 'unknown') + ')';
+            selector.appendChild(opt);
+        });
+
+        // Review form selector
+        var formSelect = document.getElementById('reviewDish');
+        formSelect.innerHTML = '';
+        dishes.forEach(function(d) {
+            var opt = document.createElement('option');
+            opt.value = d.id;
+            opt.textContent = d.name + ' (' + (d.vendor || 'unknown') + ')';
+            formSelect.appendChild(opt);
+        });
+    }
+
+    // ============================================================
+    // DISH CHANGE – only updates the data, not the layout
+    // ============================================================
+    function onDishChange() {
+        selectedDishId = document.getElementById('dishSelector').value;
+
+        // Sync the review form's dish selector to match
+        document.getElementById('reviewDish').value = selectedDishId;
+
+        // Just re-render the data sections
+        renderDishData();
+    }
+
+    // ============================================================
+    // RENDER DISH DATA (summary + reviews)
+    // ============================================================
+    function renderDishData() {
+        if (!selectedDishId) return;
+
+        var dish = getDishById(selectedDishId);
+        if (!dish) return;
+
+        var allReviews = loadReviews();
+        var dishReviews = allReviews.filter(function(r) { return r.dishId === selectedDishId; });
+
+        // Update dish name labels
+        document.getElementById('selectedDishName').textContent = dish.name;
+        document.getElementById('reviewsDishName').textContent = dish.name;
+
+        renderSummary(dishReviews);
+        renderReviewsGrid(dishReviews);
+    }
+
+    function renderSummary(reviews) {
+        var total = reviews.length;
+        document.getElementById('totalReviewsCount').textContent = total;
+
+        var avg = 0;
+        if (total > 0) {
+            var sum = reviews.reduce(function(s, r) { return s + r.rating; }, 0);
+            avg = sum / total;
+        }
+
+        document.getElementById('overallNumber').textContent = total > 0 ? avg.toFixed(1) : '—';
+
+        var starHtml = '';
+        var rounded = Math.round(avg);
+        for (var i = 1; i <= 5; i++) {
+            starHtml += (i <= rounded) ? '★' : '☆';
+        }
+        document.getElementById('overallStars').textContent = total > 0 ? starHtml : '☆☆☆☆☆';
+
+        // Distribution bars
+        var buckets = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        reviews.forEach(function(r) {
+            var s = Math.max(1, Math.min(5, r.rating));
+            buckets[s] += 1;
+        });
+
+        var html = '';
+        [5, 4, 3, 2, 1].forEach(function(star) {
+            var count = buckets[star];
+            var pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            var fillClass = star === 5 ? 'green' : (star <= 2 ? 'orange' : '');
+            html +=
+                '<div class="dist-row">' +
+                    '<div class="label">' + star + ' star</div>' +
+                    '<div class="track"><div class="fill ' + fillClass + '" style="width:' + pct + '%"></div></div>' +
+                    '<div class="count">' + count + '</div>' +
+                '</div>';
+        });
+        document.getElementById('distributionBars').innerHTML = html;
+    }
+
+    function renderReviewsGrid(reviews) {
+        var container = document.getElementById('reviewsList');
+        if (!reviews.length) {
+            container.innerHTML = '<p class="empty-note">No reviews yet for this dish. Be the first to write one.</p>';
+            return;
+        }
+
+        var sorted = reviews.slice().sort(function(a, b) {
+            return new Date(b.editedAt || b.createdAt) - new Date(a.editedAt || a.createdAt);
+        });
+
+        var html = '';
+        sorted.forEach(function(r) {
+            var stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+            var dateStr = formatDate(r.editedAt || r.createdAt);
+            var initial = r.user ? r.user.charAt(0).toUpperCase() : '?';
+
+            html +=
+                '<div class="review-card">' +
+                    '<div class="avatar">' + initial + '</div>' +
+                    '<div class="review-content">' +
+                        '<div class="review-header">' +
+                            '<span class="username">' + escapeHtml(r.user) + '</span>' +
+                            '<span class="date">Post on ' + dateStr + '</span>' +
+                        '</div>' +
+                        '<div class="review-stars">' + stars + '</div>' +
+                        '<div class="review-comment">' + escapeHtml(r.comment) + '</div>' +
+                        '<div style="margin-top:8px; display:flex; gap:6px;">' +
+                            '<button class="secondary small" onclick="editReview(\'' + r.id + '\')">Edit</button>' +
+                            '<button class="danger small" onclick="deleteReview(\'' + r.id + '\')">Delete</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+        });
+        container.innerHTML = html;
+    }
+
+    // ============================================================
+    // FORM SUBMIT
+    // ============================================================
+    function submitReview(e) {
+        e.preventDefault();
+        var id = document.getElementById('reviewId').value;
+        var user = document.getElementById('reviewUser').value.trim();
+        var dishId = document.getElementById('reviewDish').value;
+        var rating = parseInt(document.getElementById('reviewRating').value);
+        var comment = document.getElementById('reviewComment').value.trim();
+
+        if (!user) { showMessage('Please enter your name.', 'error'); return; }
+        if (!dishId) { showMessage('Please pick a dish.', 'error'); return; }
+        if (!rating || rating < 1 || rating > 5) { showMessage('Please pick a star rating.', 'error'); return; }
+        if (!comment) { showMessage('Please write a short comment.', 'error'); return; }
+
+        var reviews = loadReviews();
+
+        if (id) {
+            for (var i = 0; i < reviews.length; i++) {
+                if (reviews[i].id === id) {
+                    reviews[i].user = user;
+                    reviews[i].dishId = dishId;
+                    reviews[i].rating = rating;
+                    reviews[i].comment = comment;
+                    reviews[i].editedAt = new Date().toISOString();
+                    break;
+                }
+            }
+            showMessage('Review updated.', 'success');
+        } else {
+            reviews.push({
+                id: 'r' + Date.now() + Math.floor(Math.random() * 1000),
+                user: user,
+                dishId: dishId,
+                rating: rating,
+                comment: comment,
+                createdAt: new Date().toISOString()
+            });
+            showMessage('Review posted.', 'success');
+        }
+
+        saveReviews(reviews);
+        cancelEdit();
+
+        // If the review was posted for a different dish, jump the dashboard to it
+        if (dishId !== selectedDishId) {
+            selectedDishId = dishId;
+            document.getElementById('dishSelector').value = dishId;
+        }
+
+        renderDishData();
+    }
+
+    function showMessage(text, type) {
+        var box = document.getElementById('formMessage');
+        box.textContent = text;
+        box.className = 'form-message ' + type;
+        setTimeout(function() { box.className = 'form-message'; }, 3000);
+    }
+
+    // ============================================================
+    // EDIT / DELETE
+    // ============================================================
+    function editReview(id) {
+        var reviews = loadReviews();
+        var r = reviews.find(function(x) { return x.id === id; });
+        if (!r) return;
+
+        document.getElementById('reviewId').value = r.id;
+        document.getElementById('reviewUser').value = r.user;
+        document.getElementById('reviewDish').value = r.dishId;
+        document.getElementById('reviewComment').value = r.comment;
+
+        currentRating = r.rating;
+        document.getElementById('reviewRating').value = r.rating;
+        paintStars(r.rating);
+
+        document.getElementById('reviewFormTitle').textContent = 'Edit review';
+        document.getElementById('submitBtn').textContent = 'Save changes';
+        document.getElementById('cancelBtn').style.display = 'inline-block';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        document.getElementById('reviewForm').reset();
+        document.getElementById('reviewId').value = '';
+        document.getElementById('reviewFormTitle').textContent = 'Write a review';
+        document.getElementById('submitBtn').textContent = 'Post review';
+        document.getElementById('cancelBtn').style.display = 'none';
+        resetStarInput();
+        if (selectedDishId) {
+            document.getElementById('reviewDish').value = selectedDishId;
+        }
+    }
+
+    function deleteReview(id) {
+        if (!confirm('Delete this review?')) return;
+        var reviews = loadReviews().filter(function(r) { return r.id !== id; });
+        saveReviews(reviews);
+        if (document.getElementById('reviewId').value === id) cancelEdit();
+        renderDishData();
+    }
+
+    // ============================================================
+    // UTILITIES
+    // ============================================================
+    function escapeHtml(str) {
+        if (str == null) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
+    function init() {
+        initStarInput();
+        populateDropdownsOnce();
+
+        var dishes = loadDishes();
+
+        // No dishes at all – hide the whole thing
+        if (!dishes.length) {
+            document.getElementById('dishSelector').innerHTML = '<option>No dishes available</option>';
+            document.getElementById('summaryPanel').style.display = 'none';
+            document.getElementById('writeReviewSection').style.display = 'none';
+            document.getElementById('reviewsSection').style.display = 'none';
+            return;
+        }
+
+        // Determine which dish to show by default
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlDishId = urlParams.get('dishId');
+        var initialDishId = null;
+
+        if (urlDishId && dishes.some(function(d) { return d.id == urlDishId; })) {
+            initialDishId = urlDishId;
+        } else {
+            // Default to the first dish in the menu
+            initialDishId = dishes[0].id;
+        }
+
+        selectedDishId = initialDishId;
+        document.getElementById('dishSelector').value = initialDishId;
+        document.getElementById('reviewDish').value = initialDishId;
+
+        // First render
+        renderDishData();
+    }
+
+    init();
+
+    // Sync across tabs (if menu or reviews change elsewhere)
+    window.addEventListener('storage', function(e) {
+        if (e.key === DISH_KEY || e.key === REVIEW_KEY) {
+            var dishes = loadDishes();
+
+            // If the currently selected dish was removed, fall back to the first one
+            if (selectedDishId && !dishes.some(function(d) { return d.id == selectedDishId; })) {
+                selectedDishId = dishes.length > 0 ? dishes[0].id : null;
+            }
+
+            populateDropdownsOnce();
+            if (selectedDishId) {
+                document.getElementById('dishSelector').value = selectedDishId;
+                document.getElementById('reviewDish').value = selectedDishId;
+            }
+            renderDishData();
+        }
+    });
+</script>
+
+</body>
+</html>
