@@ -239,3 +239,18 @@ header {
 .dish-card p {
     margin: 4px 0;
 }
+
+.dish-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.dish-card {
+    cursor: pointer;
+}
+
+.dish-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
