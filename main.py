@@ -440,5 +440,10 @@ def profile():
     return render_template('profile.html', user=user, vendor=vendor)
 
 
+@app.route("/report summary", methods=["GET", "POST"])
+def report_summary():
+    return render_template("report summary.html") 
+
+
 if __name__ == "__main__":
     app.run(debug=True)
