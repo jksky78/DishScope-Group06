@@ -94,7 +94,16 @@ def register():
                 cursor.execute(input_insert_vendor, (table_username, table_vendor_name, table_vendor_location, role))
             connection.commit()
             connection.close()
-            return f'Hello, {name}'
+            conn = sqlite3.connect('dish_database.db')
+            cursor = conn.cursor()
+
+            # Fetch all dishes from the table
+            cursor.execute("SELECT * FROM dishes")
+            dishes = cursor.fetchall()  # Grab all rows
+
+            # Close the connection
+            conn.close()
+            return render_template("dishpage.html", dishes=dishes)
     
 
 
@@ -118,16 +127,22 @@ def login():
 
         
         if result and check_password_hash(result[2], table_password):
+
             print("Login successful!")   
             session["logged_in"] = True
             session["user"] = result[1]
-            session['user_id'] = result[0]     
-            session['role'] = 'student'
+            session['user_id'] = result[0] 
+
+            if result[3] == "student":    
+                session['role'] = 'student'
+            else:
+                session['role'] = 'vendor'
             print("SESSION:", session)         
             return redirect(url_for('dish_view'))
         else:
             print("Invalid username or password!")
             return render_template('login.html', error="Invalid username or password!")
+
         
     return render_template("login.html")
 
@@ -325,5 +340,12 @@ def too_large(e):
     # Flash a friendly message (requires a secret_key set on your app)
     return render_template('dish-registration.html', error="The uploaded image is too large! Please choose an image under 5MB."), 413
 
+
+
+@app.route("/menu management", methods=["GET", "POST"])
+def menu_management():
+        return render_template("menu management.html")
 if __name__ == "__main__":
     app.run(debug=True)
+
+
