@@ -340,5 +340,12 @@ def too_large(e):
     # Flash a friendly message (requires a secret_key set on your app)
     return render_template('dish-registration.html', error="The uploaded image is too large! Please choose an image under 5MB."), 413
 
+
+
+@app.route("/menu management", methods=["GET", "POST"])
+def menu_management():
+        return render_template("menu management.html")
 if __name__ == "__main__":
     app.run(debug=True)
+
+

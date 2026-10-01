@@ -69,6 +69,7 @@ function showPassword_Confirm() {
 
 
 const searchBar = document.getElementById("searchbar");
+
 const dishContainer = document.getElementById("dishContainer");
 const dishCards = Array.from(document.querySelectorAll(".dish-card"));
 const filterSelect = document.getElementById("filterSelect");
@@ -91,6 +92,8 @@ searchBar.addEventListener("input", function () {
     });
 
 });
+
+
 
 
 
@@ -185,12 +188,16 @@ function updateDishes() {
     // SORT
     // --------------------------------
 
-if (selectedSort === "priceLow") {
-        console.log("Sorting triggered!"); // Check if this prints in the console
+
+    if (selectedSort === "priceLow") {
+
         dishCards.sort(function (a, b) {
-            console.log("Comparing prices:", a.dataset.price, b.dataset.price); // Check if prices exist
-            return Number(a.dataset.price) - Number(b.dataset.price);
+
+            return Number(a.dataset.price) -
+                   Number(b.dataset.price);
+
         });
+
     }
 
 
@@ -240,6 +247,7 @@ if (selectedSort === "priceLow") {
 
 }
 
+
 sortSelect.addEventListener("change", function () {
     console.log("Selected:", sortSelect.value);
     updateDishes();
@@ -260,5 +268,4 @@ function clearPreview() {
     document.getElementById('preview').style.display = 'none';
     document.getElementById('preview-text').style.display = 'block';
         }
-
 

@@ -59,6 +59,7 @@
 
     <!-- Header section with your menu dropdown -->
     <header class="navbar">
+
         <h1>DishScope</h1>
         <nav class="nav-menu">
         <div class="dropdown">
@@ -72,6 +73,8 @@
             </div>
         </div>
     </nav>
+
+
     </header>
 
     <!-- Main Content Wrapper -->
@@ -79,9 +82,12 @@
         
 
         <!-- The Grid Container that loops through all SQLite dishes -->
+
         <div class="dish-container" id="dishContainer">
             {% for dish in dishes %}
-            <div class="dish-card" data-rating="{{ dish['rating'] }}" data-price="{{ dish['price'] }}" >
+            <a href="{{ url_for('dish_detail', dish_id=dish['id']) }}"
+               class="dish-link">
+            <div class="dish-card">
                 <!-- Dish Picture Preview -->
                 <div class="dish-picture">
                     {% if dish["image_filename"] %}
@@ -99,6 +105,7 @@
                 <p><b>Calories:</b> {{ dish['calories'] }} kcal</p>
                 <p><b>Availability:</b> {{ dish['availability'] }}</p>
             </div>
+            </a>
             {% else %}
                 <p>No dishes found in the database yet!</p>
             {% endfor %}
