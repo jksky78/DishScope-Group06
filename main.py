@@ -38,7 +38,36 @@ def init_db():
     conn.commit()
     conn.close()
 
+def init_dish_db():
+    # connects to  database (and creates the file if it doesn't exist yet)
+    conn = sqlite3.connect('dish_database.db')
+    cursor = conn.cursor()
+    
+    # CREATE TABLE IF NOT EXISTS
+    cursor = conn.cursor()
+    cursor.execute("""
+            CREATE TABLE IF NOT EXISTS dishes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                category TEXT,
+                price REAL,
+                description TEXT,
+                calories INTEGER,
+                ingredients TEXT,
+                vegetarian TEXT,
+                spicy_level TEXT,
+                allergens TEXT,
+                availability TEXT,
+                image_filename TEXT
+            )
+        """)
+    
+    conn.commit()
+    conn.close()
+
+
 init_db()
+init_dish_db()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -324,16 +353,16 @@ def dish_view():
             print("DATABASE ERROR:")
         # If the table doesn't exist yet, set dishes to an empty list
             dishes = []
+        if dishes:
+            print(dishes[0]['image_filename'])
+        
+        return render_template("dishpage.html", dishes=dishes)
     else:
         print("You dont have access to this page")
         flash('You must be logged in to view that page.', 'danger')
         return redirect(url_for('home', error="You do not have access to this page, please log in"))
         
-    if dishes:
-        print(dishes[0]['image_filename'])
-        return render_template("dishpage.html", dishes=dishes)
-    conn.commit()
-    conn.close()
+
 
 @app.errorhandler(413)
 def too_large(e):
