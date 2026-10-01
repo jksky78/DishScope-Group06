@@ -21,12 +21,19 @@
 <body>
 
     <div class="form-container">
+        {% if error %}
+            <div class="alert alert-danger" style="color: red; background: #ffe6e6; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                {{ error }}
+            </div>
+        {% endif %}
         <h2>Add new dish</h2>
         <p class="instruction">Your Dish (Type in empty box or select fixed option):</p>
-
+        
         <form action="/create_dish" method="POST" enctype="multipart/form-data">
             
             <div class="form-main-layout">
+
+                
                 <!-- Left Side: Inputs -->
                 <div class="form-fields">
                     <div class="form-group">
@@ -36,7 +43,7 @@
 
                     <div class="form-group">
                         <label>Category:</label>
-                        <input type="text" name="category">
+                        <input type="text" name="category" required>
                     </div>
 
                     <div class="form-group">
@@ -94,12 +101,17 @@
 
                 <!-- Right Side: Image Preview & Upload -->
                 <div class="image-upload-section">
-                    <div class="image-preview-box">
-                        <img id="preview" src="" alt="Image preview" style="display:none; max-width:100%; max-height:100%;">
-                        <span id="preview-text">Image preview</span>
-                    </div>
-                    <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" onchange="previewImage(event)">
-                    <button type="button" onclick="document.getElementById('imageInput').click();" class="upload-btn">Upload Image</button>
+                        <div class="image-preview-box">
+                            <img id="preview" src="" alt="Image preview" style="display:none; max-width:100%; max-height:100%;">
+                            <span id="preview-text">Image preview</span>
+                        </div>
+                        <input type="file" name="file" id="imageInput" required accept="image/*" style="display: none;"  onchange="previewImage(event)">
+                        <button type="button"  class="upload-btn" onclick="document.getElementById('imageInput').click()">Upload Image</button>
+                        <p>*File must not exceed 5 MB</p>
+                        
+
+
+                    
                 </div>
             </div>
 
@@ -112,21 +124,7 @@
         </form>
     </div>
 
-    <script>
-        function previewImage(event) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                const output = document.getElementById('preview');
-                output.src = reader.result;
-                output.style.display = 'block';
-                document.getElementById('preview-text').style.display = 'none';
-            };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-        function clearPreview() {
-            document.getElementById('preview').style.display = 'none';
-            document.getElementById('preview-text').style.display = 'block';
-        }
+    <script src="../static/javascript/index.js">
     </script>
 </body>
 </html>

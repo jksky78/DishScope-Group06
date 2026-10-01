@@ -1,17 +1,44 @@
-from flask import Flask, render_template, request, redirect, url_for, session , flash
+from flask import Flask, render_template, request, redirect, url_for, session , flash, jsonify
 from itsdangerous import URLSafeSerializer
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.exceptions import RequestEntityTooLarge
+from werkzeug.utils import secure_filename
+import os
+import uuid
 import sqlite3
 
 
 app = Flask(__name__)
 app.secret_key = "DishScope-000"
+UPLOAD_FOLDER = 'static/img'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
 @app.get("/")
 def home ():
     if request.method == 'GET':
         print(session)
         return render_template("homepage.html")
+def init_db():
+    # connects to  database (and creates the file if it doesn't exist yet)
+    conn = sqlite3.connect('test.db')
+    cursor = conn.cursor()
+    
+    # CREATE TABLE IF NOT EXISTS
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+               ID integer primary key autoincrement,
+                name text not null,
+                password text not null,
+                email text not null,
+                role text not null
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
+
+init_db()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -67,7 +94,16 @@ def register():
                 cursor.execute(input_insert_vendor, (table_username, table_vendor_name, table_vendor_location, role))
             connection.commit()
             connection.close()
-            return f'Hello, {name}'
+            conn = sqlite3.connect('dish_database.db')
+            cursor = conn.cursor()
+
+            # Fetch all dishes from the table
+            cursor.execute("SELECT * FROM dishes")
+            dishes = cursor.fetchall()  # Grab all rows
+
+            # Close the connection
+            conn.close()
+            return render_template("dishpage.html", dishes=dishes)
     
 
 
@@ -91,16 +127,22 @@ def login():
 
         
         if result and check_password_hash(result[2], table_password):
+
             print("Login successful!")   
             session["logged_in"] = True
             session["user"] = result[1]
-            session['user_id'] = result[0]     
-            session['role'] = 'student'
+            session['user_id'] = result[0] 
+
+            if result[3] == "student":    
+                session['role'] = 'student'
+            else:
+                session['role'] = 'vendor'
             print("SESSION:", session)         
             return redirect(url_for('dish_view'))
         else:
             print("Invalid username or password!")
             return render_template('login.html', error="Invalid username or password!")
+
         
     return render_template("login.html")
 
@@ -177,11 +219,27 @@ def reset_password():
 def add_dish():
     return render_template("dish-registration.html")
 
+@app.route("/upload-image", methods=["POST"])
+def upload():
+    file = request.files['file']
+    if file:
+        filename = secure_filename(file.filename)
+        return jsonify({
+            'message': 'Image uploaded successfully!', 
+            'filename': filename
+        }), 200
+        
+    
 
 @app.route("/create_dish", methods=["GET", "POST"])
 def create_dish():
   if request.method == "POST":
     conn = sqlite3.connect("dish_database.db")
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+    unique_filename = f"{uuid.uuid4()}_{filename}"
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+    file.save(filepath)
     cursor = conn.cursor()
     cursor.execute("""
             CREATE TABLE IF NOT EXISTS dishes (
@@ -211,14 +269,17 @@ def create_dish():
     allergens = request.form.get("allergens")
     availability = request.form.get("availability")
 
+
     # Handle image filename if uploaded
     image_filename = ""
     if "image" in request.files:
         file = request.files["image"]
         if file.filename != "":
             image_filename = file.filename
-    cursor.execute(input_insert_dish, (name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, image_filename))
+    cursor.execute(input_insert_dish, (name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, unique_filename))
+    print(unique_filename)
     conn.commit()
+    conn.close()
     conn = sqlite3.connect("dish_database.db")
     conn.row_factory = (
       sqlite3.Row
@@ -232,6 +293,7 @@ def create_dish():
   # Close the connection
     conn.close()
     return render_template("dishpage.html", dishes=dishes)
+
   
 def get_dish_from_db():
   # Connect to SQLite database
@@ -257,7 +319,9 @@ def dish_view():
         # Try to fetch all dishes from the table
             cursor.execute("SELECT * FROM dishes")
             dishes = cursor.fetchall()  # Grab all rows
+            print("ALL DISHES FOUND:", dishes)
         except sqlite3.OperationalError:
+            print("DATABASE ERROR:")
         # If the table doesn't exist yet, set dishes to an empty list
             dishes = []
     else:
@@ -265,9 +329,16 @@ def dish_view():
         flash('You must be logged in to view that page.', 'danger')
         return redirect(url_for('home', error="You do not have access to this page, please log in"))
         
-
+    if dishes:
+        print(dishes[0]['image_filename'])
+        return render_template("dishpage.html", dishes=dishes)
+    conn.commit()
     conn.close()
-    return render_template("dishpage.html", dishes=dishes)
+
+@app.errorhandler(413)
+def too_large(e):
+    # Flash a friendly message (requires a secret_key set on your app)
+    return render_template('dish-registration.html', error="The uploaded image is too large! Please choose an image under 5MB."), 413
 
 
 

@@ -254,3 +254,18 @@ sortSelect.addEventListener("change", function () {
 });
 
 
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+    const output = document.getElementById('preview');
+    output.src = reader.result;
+    output.style.display = 'block';
+    document.getElementById('preview-text').style.display = 'none';
+        };
+    reader.readAsDataURL(event.target.files[0]);
+        }
+function clearPreview() {
+    document.getElementById('preview').style.display = 'none';
+    document.getElementById('preview-text').style.display = 'block';
+        }
+
