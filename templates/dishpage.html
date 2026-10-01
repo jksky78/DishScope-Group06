@@ -34,10 +34,9 @@
     </select>
     </div>
             <!-- Profile icon -->
-             <a href="{{ url_for('profile') }}" style="display: block; width: fit-content;">
-                            <div class="profile">
-                <div class="head"></div>
-                <div class="body"></div>
+             <a href="{{ url_for('profile') }}" style="display: block; width: fit-content; text-decoration: none;">
+                <div class="avatar">
+                    {{ user['name'][0] | upper }}
             </div>
 
              </a>

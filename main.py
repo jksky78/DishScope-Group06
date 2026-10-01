@@ -350,6 +350,16 @@ def get_dish_from_db():
 def dish_view():
     if "logged_in" in  session:
         print(session)
+        # 1. Get user_id from session FIRST
+        user_id = session.get('user_id')
+    
+    # 2. Connect to users database ('test.db') and fetch user
+        conn_users = sqlite3.connect("test.db")
+        conn_users.row_factory = sqlite3.Row
+        cursor_users = conn_users.cursor()
+    
+        user = cursor_users.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+        conn_users.close()  # Close when done
         conn = sqlite3.connect("dish_database.db")
         conn.row_factory = (sqlite3.Row) 
         cursor = conn.cursor()
@@ -365,7 +375,7 @@ def dish_view():
         if dishes:
             print(dishes[0]['image_filename'])
         
-        return render_template("dishpage.html", dishes=dishes)
+        return render_template("dishpage.html", dishes=dishes, user=user)
     else:
         print("You dont have access to this page")
         flash('You must be logged in to view that page.', 'danger')
