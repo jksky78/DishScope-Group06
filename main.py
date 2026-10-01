@@ -269,5 +269,12 @@ def dish_view():
     conn.close()
     return render_template("dishpage.html", dishes=dishes)
 
+
+
+@app.route("/menu management", methods=["GET", "POST"])
+def menu_management():
+        return render_template("menu management.html")
 if __name__ == "__main__":
     app.run(debug=True)
+
+
