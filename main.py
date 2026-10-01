@@ -444,9 +444,11 @@ def profile():
 def report_summary():
     return render_template("report summary.html") 
 
+
 @app.route("/review rating", methods=["GET", "POST"])
 def review_rating():
     return render_template("review rating.html") 
+
 
 
 if __name__ == "__main__":
