@@ -394,9 +394,13 @@ def too_large(e):
 def menu_management():
         return render_template("menu management.html")
 
-@app.route("/dish_detail", methods=["GET", "POST"])
-def dish_detail():
+@app.route("/dish detailed dashboard", methods=["GET", "POST"])
+def dish_detailed_dashboard():
         return render_template("dish detailed dashboard.html")
+
+@app.route("/dishpage", methods=["GET", "POST"])
+def dishpage():
+        return render_template("dishpage.html")
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
@@ -434,11 +438,6 @@ def profile():
     else:
         vendor = None
     return render_template('profile.html', user=user, vendor=vendor)
-
-@app.route("/dishpage", methods=["GET", "POST"])
-def your_function_name():
-    return render_template("dishpage.html") 
-
 
 
 if __name__ == "__main__":
