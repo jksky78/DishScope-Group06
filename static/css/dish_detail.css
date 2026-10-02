@@ -55,9 +55,11 @@ header {
     cursor: pointer;
     transition: background 0.3s;
 }
+
 .dropbtn:hover {
     background-color: #1a2634;
 }
+
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
     display: none;
@@ -93,7 +95,9 @@ header {
     position: relative;
     border-radius: 30px; /* For button shape */
     background-color: aliceblue;
+
 }
+
 .toggle_button {
     padding: 10px 30px; /* Text box size */
     cursor: pointer;
@@ -104,14 +108,19 @@ header {
     background: transparent;
     text-align: center;
 }
+
+
 .page {
     max-width: 1000px;
     margin: auto;
     border: 3px solid black;
     padding: 30px;
 }
+
+
 p.description{
     margin-top: 25px;
+
 }
 /* BACK BUTTON */
 .star-rating {
@@ -123,9 +132,11 @@ p.description{
     cursor: pointer;
     margin-bottom: 10px;
 }
+
 .star-rating input {
     display: none; /* Hide the actual radio buttons */
 }
+
 .star-rating label {
     color: #cbd5e1; /* Grey color for unselected stars */
     transition: color 0.2s;
@@ -515,7 +526,8 @@ h1 {
             flex-direction: column;
             gap: 15px; /* Adds clean spacing between the cards */
             padding: 15px;
-            
+           
+
         }
         @media (max-width: 800px) {
             .reviews-grid { grid-template-columns: 1fr; }
