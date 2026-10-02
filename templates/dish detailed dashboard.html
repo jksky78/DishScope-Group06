@@ -12,6 +12,7 @@
 
     <link rel="stylesheet"
           href="../static/css/dish_detail.css">
+
     <header>
         <h1>DishScope</h1>
         <nav class="nav-menu">
@@ -23,6 +24,7 @@
         </div>
     </nav>
     </header>
+
 </head>
 
 
@@ -49,7 +51,10 @@
             {% if dish['image_filename'] %}
 
                 <img
+
                     src="{{ url_for('static', filename='img/' + dish['image_filename']) }}"
+
+
                     alt="{{ dish['name'] }}"
                 >
 
@@ -80,7 +85,10 @@
 
             <p>
                 <b>Vendor:</b>
+
                 {{ vendor['vendor_name'] }}
+
+
             </p>
 
             <p>
@@ -99,8 +107,10 @@
 
             <h2>1. Description</h2>
 
+
             <p class="description">
                 {{ dish['description'] if dish['description'] else "No description added about the dish"  }}
+
             </p>
 
         </section>
@@ -163,6 +173,7 @@
 
         <div class="rating-distribution">
             <h3>Total reviews for <span id="selectedDishName">this dish</span>: {{ total_reviews }}</h3>
+
             <div id="distributionBars"></div>
         </div>
     </div>
@@ -173,16 +184,20 @@
     <div class="write-review-section">
         <h2 id="reviewFormTitle">Write a review</h2>
         <div id="formMessage" class="form-message"></div>
+
         <form id="reviewForm" action="{{ url_for('add_review', dish_id=dish['id']) }}", method="POST">
             <input type="hidden" id="reviewId">
 
             <div class="form-group">
                 <label>Dish:</label>
                 {{ dish['name'] }}
+
+
             </div>
 
             <div class="form-group">
                 <label>Rating:</label>
+
                 <div class="star-rating" id="starInput">
                 <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars">★</label>
                 <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
@@ -190,11 +205,16 @@
                 <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
                 <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
                 </div>
+
+
             </div>
 
             <div class="form-group" style="align-items: flex-start;">
                 <label style="padding-top:8px;">Comment:</label>
+
                 <textarea name="comment" id="comment" placeholder="How was the dish?" maxlength="300" required></textarea>
+
+
             </div>
 
             <div class="review-form-actions">
@@ -245,6 +265,8 @@
         </div>
 
         
+
+
         </div>
     </div>
 
@@ -254,8 +276,7 @@
 
 </div>
 
-<script src="../static/javascript/index.js">
-</script>
+<script src="../static/javascript/index.js"><script>
 
 </body>
 </html>

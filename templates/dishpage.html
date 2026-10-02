@@ -37,6 +37,7 @@
              <a href="{{ url_for('profile') }}" style="display: block; width: fit-content; text-decoration: none;">
                 <div class="avatar">
                     {{ user['name'][0] | upper }}
+
             </div>
 
              </a>
@@ -49,6 +50,8 @@
         <div class="dropdown">
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
+
+
                 {% if session.get('role') == 'vendor' %}
                     <a href="{{ url_for('add_dish') }}">Add Dish</a>
                     <a href="{{ url_for('menu_management') }}">Menu Management</a>
