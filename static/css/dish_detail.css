@@ -13,6 +13,113 @@ body {
     background-color: white;
 }
 
+header {
+    background-color: #0b131e;
+    color: #ffffff;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Main Header Bar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0b131e; /* Matches your dark theme */
+    padding: 15px 30px;
+    color: #ffffff;
+}
+
+/* Logo styling */
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+/* Dropdown Container */
+.nav-menu {
+    position: relative;
+}
+
+.alert-danger {
+    color: rgb(239, 22, 22);
+}
+/* Dropdown Button */
+.dropbtn {
+    background-color: transparent;
+    color: white;
+    padding: 8px 16px;
+    font-size: 1rem;
+    border: 1px solid #2a3b4c;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.dropbtn:hover {
+    background-color: #1a2634;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0; /* Aligns dropdown to the right edge */
+    background-color: #1a2634;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.3);
+    z-index: 1000;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #2a3b4c;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: white;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.95rem;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #2a3b4c;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+.toggle_box {
+    width: 225px; 
+    margin: 35px auto;
+    position: relative;
+    border-radius: 30px; /* For button shape */
+    background-color: aliceblue;
+
+}
+
+.toggle_button {
+    padding: 10px 30px; /* Text box size */
+    cursor: pointer;
+    border: 0;
+    position: relative;
+    text-align: center;
+    outline: none;
+    background: transparent;
+    text-align: center;
+}
+
 
 .page {
     max-width: 1000px;
@@ -25,7 +132,36 @@ body {
 }
 
 
+p.description{
+    margin-top: 25px;
+
+}
 /* BACK BUTTON */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 5px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.star-rating input {
+    display: none; /* Hide the actual radio buttons */
+}
+
+.star-rating label {
+    color: #cbd5e1; /* Grey color for unselected stars */
+    transition: color 0.2s;
+}
+
+/* Turn stars gold when hovered or checked */
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #f59e0b; /* Warm gold */
+}
 
 .back-button {
     display: inline-block;
@@ -480,17 +616,39 @@ h1 {
             margin-bottom: 15px;
         }
         .reviews-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+
+            
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Adds clean spacing between the cards */
+            padding: 15px;
+           
+
         }
         @media (max-width: 800px) {
             .reviews-grid { grid-template-columns: 1fr; }
         }
 
+        .review-card p {
+            gap: 15px; /* Creates clean spacing between each separate card */
+            margin: 4px 0;
+            display: inline-block;
+            margin-right: 200px; /* Spacings between Name, Date, Rating, and Comment */
+        }
+        .review-card b {
+            margin: 4px 0;
+            display: inline-block;
+            margin-right: 20px; /* Spacings between Name, Date, Rating, and Comment */
+        }
         .review-card {
-            display: flex;
+            display: inline-block;
             gap: 12px;
+            margin-right: 20px;
             border: 1px solid #eee;
             border-radius: 8px;
             padding: 15px;
@@ -516,6 +674,8 @@ h1 {
             justify-content: space-between;
             align-items: baseline;
             margin-bottom: 4px;
+            gap: 10px;
+
         }
         .review-header .username {
             font-weight: bold;
