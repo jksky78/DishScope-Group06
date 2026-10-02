@@ -3,6 +3,7 @@
 <head>
     <title>Menu Management</title>
     <style>
+
         body {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -353,7 +354,7 @@ button.success:hover {
 }
        
        
-       
+
     </style>
 </head>
 <body>
@@ -363,6 +364,7 @@ button.success:hover {
 
     <div class="header-actions">
         <div class="stats">
+
             <span>Total dishes: {{ total_dishes }}</span>
             <span>Available: <span id="available">{{ total_availability }}</span></span>
             <span>Unavailable: <span id="unavailable">{{ total_unavailability }}</span></span>
@@ -370,11 +372,14 @@ button.success:hover {
         <a href="dish-registration.html" class="btn-primary">+ Add New Dish</a>
     </div>
     
+
+
     <!-- Card Grid -->
     <div class="menu-grid" id="menuGrid"></div>
 
     <!-- Edit Form Section -->
     <div id="editSection">
+
     <h2>Edit Dish (for vendor only)</h2>
     <form id="editDishForm">
         <input type="hidden" id="editId">

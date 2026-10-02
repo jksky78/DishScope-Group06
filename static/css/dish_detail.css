@@ -12,6 +12,7 @@ body {
 
     background-color: white;
 }
+
 header {
     background-color: #0b131e;
     color: #ffffff;
@@ -119,6 +120,7 @@ header {
     text-align: center;
 }
 
+
 .page {
     max-width: 1000px;
 
@@ -128,6 +130,7 @@ header {
 
     padding: 30px;
 }
+
 
 p.description{
     margin-top: 25px;
@@ -159,6 +162,7 @@ p.description{
 .star-rating label:hover ~ label {
     color: #f59e0b; /* Warm gold */
 }
+
 .back-button {
     display: inline-block;
 
@@ -612,6 +616,7 @@ h1 {
             margin-bottom: 15px;
         }
         .reviews-grid {
+
             
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -622,11 +627,13 @@ h1 {
             flex-direction: column;
             gap: 15px; /* Adds clean spacing between the cards */
             padding: 15px;
-            
+           
+
         }
         @media (max-width: 800px) {
             .reviews-grid { grid-template-columns: 1fr; }
         }
+
         .review-card p {
             gap: 15px; /* Creates clean spacing between each separate card */
             margin: 4px 0;
@@ -668,6 +675,7 @@ h1 {
             align-items: baseline;
             margin-bottom: 4px;
             gap: 10px;
+
         }
         .review-header .username {
             font-weight: bold;
