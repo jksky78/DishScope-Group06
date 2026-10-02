@@ -48,6 +48,7 @@ def init_dish_db():
     cursor.execute("""
             CREATE TABLE IF NOT EXISTS dishes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                vendor_id INTEGER,
                 name TEXT NOT NULL,
                 category TEXT,
                 price REAL,
@@ -65,9 +66,27 @@ def init_dish_db():
     conn.commit()
     conn.close()
 
+def init_dish_review():
+    conn = sqlite3.connect("dish_database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS reviews (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        dish_id INTEGER,      
+        user_id INTEGER,       
+        student_name TEXT,     
+        rating INTEGER,        
+        comment TEXT,          
+        date_posted TEXT       
+    )
+""")
+    conn.commit()
+    conn.close()
 
 init_db()
 init_dish_db()
+init_dish_review()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -272,6 +291,13 @@ def upload():
 @app.route("/create_dish", methods=["GET", "POST"])
 def create_dish():
   if request.method == "POST":
+    user_id = session.get('user_id')
+    # 2. Connect to users database ('test.db') and fetch user
+    conn_users = sqlite3.connect("test.db")
+    conn_users.row_factory = sqlite3.Row
+    cursor_users = conn_users.cursor()
+    user = cursor_users.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    conn_users.close()  # Close when done
     conn = sqlite3.connect("dish_database.db")
     file = request.files['file']
     filename = secure_filename(file.filename)
@@ -282,6 +308,7 @@ def create_dish():
     cursor.execute("""
             CREATE TABLE IF NOT EXISTS dishes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                vendor_id INTEGER,
                 name TEXT NOT NULL,
                 category TEXT,
                 price REAL,
@@ -295,7 +322,7 @@ def create_dish():
                 image_filename TEXT
             )
         """)
-    input_insert_dish = "insert into dishes (name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, image_filename) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    input_insert_dish = "insert into dishes (vendor_id, name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, image_filename) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     name = request.form.get("name")
     category = request.form.get("category")
     price = request.form.get("price")
@@ -314,7 +341,7 @@ def create_dish():
         file = request.files["image"]
         if file.filename != "":
             image_filename = file.filename
-    cursor.execute(input_insert_dish, (name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, unique_filename))
+    cursor.execute(input_insert_dish, (user_id, name, category, price, description, calories, ingredients, vegetarian, spicy_level, allergens, availability, unique_filename))
     print(unique_filename)
     conn.commit()
     conn.close()
@@ -330,7 +357,8 @@ def create_dish():
 
   # Close the connection
     conn.close()
-    return render_template("dishpage.html", dishes=dishes)
+    return render_template("dishpage.html", dishes=dishes, user=user)
+  
 
   
 def get_dish_from_db():
@@ -394,9 +422,44 @@ def too_large(e):
 def menu_management():
         return render_template("menu management.html")
 
-@app.route("/dish detailed dashboard", methods=["GET", "POST"])
-def dish_detailed_dashboard():
-        return render_template("dish detailed dashboard.html")
+
+@app.route("/dish/<int:dish_id>", methods=["GET", "POST"])
+def dish_detail(dish_id):
+        print(f"Clicked Dish ID: {dish_id}")
+    
+        conn = sqlite3.connect("dish_database.db")
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+    
+        # Fetch specific dish info using the passed IDs
+        dish = cursor.execute('SELECT * FROM dishes WHERE id = ?', (dish_id,)).fetchone()
+        reviews = cursor.execute('SELECT * FROM reviews WHERE dish_id = ? ORDER BY id DESC', (dish_id,)).fetchall()
+        # 3. Calculate total reviews and average rating using SQLite built-in functions
+        stats = cursor.execute('''
+            SELECT COUNT(*) as total, AVG(rating) as average 
+            FROM reviews WHERE dish_id = ?
+        ''', (dish_id,)).fetchone()
+    
+        total_reviews = stats['total'] if stats['total'] else 0
+        # Round average to 1 decimal place (e.g., 3.3), default to 0 if no reviews
+        avg_rating = round(stats['average'], 1) if stats['average'] else 0.0
+        conn.close()
+        # 2. Connect to users/vendors database (test.db) using the dish's vendor_id
+        conn_users = sqlite3.connect("test.db")
+        conn_users.row_factory = sqlite3.Row
+        cursor_users = conn_users.cursor()
+        
+        vendor = None
+        if dish and dish['vendor_id']:
+            vendor = cursor_users.execute('SELECT vendor_name FROM vendors WHERE id = ?', (dish['vendor_id'],)).fetchone()
+    
+        conn_users.close()
+    
+    # 3. Pass both 'dish' and 'vendor' to the template
+        return render_template("dish detailed dashboard.html", dish=dish, vendor=vendor, reviews=reviews, total_reviews=total_reviews, avg_rating=avg_rating)
+
+
+
 
 @app.route("/dishpage", methods=["GET", "POST"])
 def dishpage():
@@ -439,14 +502,56 @@ def profile():
         vendor = None
     return render_template('profile.html', user=user, vendor=vendor)
 
+@app.route("/dish/<int:dish_id>/review", methods=["GET", "POST"])
+def add_review(dish_id):
+    print("ALL FORM DATA:", request.form)
+    user_id = session.get('user_id')
+    rating = request.form.get('rating')  # Grabs the star number (e.g., "5")
+    comment = request.form.get('comment')
+ 
+    if not rating:
+        print("failed")
+        flash("Please select a star rating!", "danger")
+        return redirect(url_for('dish_detail', dish_id=dish_id))
+    
+    rating_int = int(rating)
+    
+
+    # Fetch student name from test.db
+    conn_users = sqlite3.connect("test.db")
+    conn_users.row_factory = sqlite3.Row
+    cursor_users = conn_users.cursor()
+    student = cursor_users.execute('SELECT name FROM users WHERE id = ?', (user_id,)).fetchone()
+    conn_users.close()
+    
+    student_name = student['name'] if student else "Anonymous"
+    
+    # Save into dish_database.db's reviews table
+    conn = sqlite3.connect("dish_database.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO reviews (dish_id, user_id, student_name, rating, comment)
+        VALUES (?, ?, ?, ?, ?)
+    """, (dish_id, user_id, student_name, rating_int, comment))
+    print("Success")
+ 
+    
+    #  Get all reviews belonging to this dish
+    reviews = cursor.execute('SELECT * FROM reviews WHERE dish_id = ? ORDER BY id DESC', (dish_id,)).fetchall()
+    conn.commit()
+    conn.close()
+    print("SUCCESS")
+    return redirect(url_for('dish_detail', dish_id=dish_id, reviews=reviews))
 
 @app.route("/report summary", methods=["GET", "POST"])
 def report_summary():
     return render_template("report summary.html") 
 
+
 @app.route("/review rating", methods=["GET", "POST"])
 def review_rating():
     return render_template("review rating.html") 
+
 
 
 if __name__ == "__main__":
