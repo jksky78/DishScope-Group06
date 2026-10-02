@@ -420,7 +420,26 @@ def too_large(e):
 
 @app.route("/menu management", methods=["GET", "POST"])
 def menu_management():
-        return render_template("menu management.html")
+        conn = sqlite3.connect("test.db")
+        conn.row_factory = (sqlite3.Row)
+        cursor = conn.cursor()
+        user_id = session.get('user_id')
+        user = cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+        conn.close()
+        # Connect dish database next
+        conn = sqlite3.connect("dish_database.db")
+        conn.row_factory = (sqlite3.Row) 
+        cursor = conn.cursor()
+
+        dishes = cursor.execute("SELECT * FROM dishes WHERE vendor_id = ?", (user_id,)).fetchall()
+        total_dishes = cursor.execute("SELECT COUNT(*) FROM dishes WHERE vendor_id = ?", (user_id,)).fetchone()[0]
+        total_availability = cursor.execute("SELECT COUNT(*) FROM dishes WHERE vendor_id = ? AND availability = 'Yes' COLLATE NOCASE", (user_id,)).fetchone()[0]
+        total_unavailability = cursor.execute("SELECT COUNT(*) FROM dishes WHERE vendor_id = ? AND availability = 'No' COLLATE NOCASE", (user_id,)).fetchone()[0]
+        
+        
+        
+        return render_template("menu management.html", user=user, dishes=dishes, total_dishes=total_dishes,
+                               total_availability=total_availability, total_unavailability=total_unavailability)
 
 @app.route("/dish/<int:dish_id>", methods=["GET", "POST"])
 def dish_detail(dish_id):
