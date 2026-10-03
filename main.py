@@ -52,6 +52,15 @@ def init_db():
                 role text not null
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS vendors (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            vendor_name TEXT NOT NULL,
+            vendor_location TEXT NOT NULL,
+            role TEXT NOT NULL
+        )
+    ''')
     
     conn.commit()
     conn.close()
