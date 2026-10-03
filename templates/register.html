@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
     <header>
         <h1>DishScope</h1>
         <nav class="nav-menu">
@@ -20,13 +20,23 @@
 <body>
     <form method="POST" action="/register">
         <div class="form-box">
+            <!-- Flash Messages Block -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" style="padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
             {% if error_vendor %}
                 <p style="color: red; background: #ffe6e6; padding: 10px; margin-bottom: 15px; border-radius: 5px;">{{ error_vendor }}</p>
             {% endif %}
             <h1>Sign up</h1>
-            <label class="role">
-            Which role are you?
-            </label>
+            <p class="role">
+                Which role are you?
+            </p>
             <div class="toggle_box">
             <div class="button_box">
                 <div id="button"></div>
@@ -69,11 +79,14 @@
 
         </div>
         <button type="submit" class="submits">Confirm</button>
-        <p class="helper">Already has an account? <a href="{{ url_for('login') }}">Log in</a></p>
+        <p class="register-link">Already has an account? <a href="{{ url_for('login') }}">Log in</a></p>
         </div>
 
     </form>
 
     <script src="../static/javascript/index.js"></script>
 </body>
+    <footer id="ds-footer">
+        <p>&copy; 2026 DishScope. All rights reserved.</p>
+    </footer>
 </html>
