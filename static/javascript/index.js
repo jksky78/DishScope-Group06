@@ -69,6 +69,7 @@ function showPassword_Confirm() {
 
 
 const searchBar = document.getElementById("searchbar");
+
 const dishContainer = document.getElementById("dishContainer");
 const dishCards = Array.from(document.querySelectorAll(".dish-card"));
 const filterSelect = document.getElementById("filterSelect");
@@ -91,6 +92,8 @@ searchBar.addEventListener("input", function () {
     });
 
 });
+
+
 
 
 
@@ -183,12 +186,13 @@ function updateDishes() {
 // --------------------------------
     // SORT (
     // --------------------------------
-    // Convert NodeList to an Array so we can sort it
+
+    
     const cardsArray = Array.from(dishCards);
 
     cardsArray.sort(function (a, b) {
         if (selectedSort === "all") {
-            // Default: Put them back in their original page-load order
+            
             return originalOrder.indexOf(a) - originalOrder.indexOf(b);
         } 
         else if (selectedSort === "priceLow") {
@@ -206,11 +210,12 @@ function updateDishes() {
         return 0;
     });
 
-    // Put the sorted cards back into the container visually
+    
     cardsArray.forEach(function (card) {
         dishContainer.appendChild(card);
     });
 }
+
 
 sortSelect.addEventListener("change", function () {
     console.log("Selected:", sortSelect.value);
@@ -238,11 +243,11 @@ function previewImageEdit(event) {
     const input = event.target;
     const preview = document.getElementById('editImagePreview');
 
-    // Check if a file was actually selected
+  
     if (input.files && input.files[0]) {
         const reader = new FileReader();
 
-        // When the file is read, change the image tag's src to the temporary local file URL
+        
         reader.onload = function(e) {
             preview.src = e.target.result;
         }
@@ -250,3 +255,4 @@ function previewImageEdit(event) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+

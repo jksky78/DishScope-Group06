@@ -489,6 +489,7 @@ def menu_management():
         return render_template("menu management.html", user=user, dishes=dishes, total_dishes=total_dishes,
                                total_availability=total_availability, total_unavailability=total_unavailability)
 
+
 @app.route("/dish/<int:dish_id>", methods=["GET", "POST"])
 def dish_detail(dish_id):
         print(f"Clicked Dish ID: {dish_id}")
@@ -523,6 +524,13 @@ def dish_detail(dish_id):
     
     # 3. Pass both 'dish' and 'vendor' to the template
         return render_template("dish detailed dashboard.html", dish=dish, vendor=vendor, reviews=reviews, total_reviews=total_reviews, avg_rating=avg_rating)
+
+
+
+
+@app.route("/dishpage", methods=["GET", "POST"])
+def dishpage():
+        return render_template("dishpage.html")
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
@@ -735,7 +743,16 @@ def report_summary():
                             total_reviews=total_reviews, highest_rated=highest_rated, most_reviewed=most_reviewed)
 
 
+@app.route("/report summary", methods=["GET", "POST"])
+def report_summary():
+    return render_template("report summary.html") 
+
+
+@app.route("/review rating", methods=["GET", "POST"])
+def review_rating():
+    return render_template("review rating.html") 
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-
-

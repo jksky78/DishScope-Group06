@@ -5,13 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dish View Page</title>
-    <link rel="stylesheet" href="../static/css/dishpage.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dishpage.css') }}">
 </head>
 <body>
-    <h1>4. Dish View page</h1>
     <div class="page">
         <!-- Top section -->
         <div class="top-section">
+            <h1>Welcome back, {{ user['name'] }} !</h1>
+            <p style="color: #6b7280; font-size: 20px;">
+                {% if session.get('role') == 'vendor' %}
+                    Ready to update your menu? Your dishes and reports are right here.
+                    <p class="secondary-text" >(You can add, edit, and manage your dishes anytime via the menu panel.)</p>
+                {% else %}
+                    Not sure what to eat? Discover and explore different kinds of campus dishes today.
+                {% endif %}
+                
+            </p>
             <input 
                 type="text"
                 id="searchbar" 
@@ -19,19 +28,24 @@
                 placeholder="Search bar: (type here)"
             >
             <div class="controls">
-    <select id="filterSelect">
-        <option value="all">Filter:</option>
-        <option value="main">Main Dish</option>
-        <option value="side">Side Dish</option>
+        <div class="filter-wrapper" style="display: flex; align-items: center; gap: 10px;">
+            <label for="filterSelect" style="font-weight: bold;">Filter by:</label>
+            <select id="filterSelect">
+                <option value="all">Default</option>
+                <option value="main">Main Dish</option>
+                <option value="Side">Side Dish</option>
+                <option value="dessert">Dessert</option>
+        </select>
+            <label for="filterSelect" style="font-weight: bold;">Sort by:</label>
+            <select id="sortSelect">
+                <option value="all">Default</option>
+                <option value="priceLow">Lowest Price</option>
+                <option value="priceHigh">Highest Price</option>
+                <option value="ratingLow">Lowest Rating</option>
+                <option value="ratingHigh">Highest Rating</option>
     </select>
+        </div>
 
-    <select id="sortSelect">
-        <option value="default">Sort by:</option>
-        <option value="priceLow">Lowest Price</option>
-        <option value="priceHigh">Highest Price</option>
-        <option value="ratingLow">Lowest Rating</option>
-        <option value="ratingHigh">Highest Rating</option>
-    </select>
     </div>
             <!-- Profile icon -->
              <a href="{{ url_for('profile') }}" style="display: block; width: fit-content; text-decoration: none;">
@@ -49,10 +63,13 @@
         <div class="dropdown">
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
+                <a href="{{ url_for('dish_view') }}">View Dish</a>
                 {% if session.get('role') == 'vendor' %}
                     <a href="{{ url_for('add_dish') }}">Add Dish</a>
                     <a href="{{ url_for('menu_management') }}">Menu Management</a>
+                    <a href="{{ url_for('report_summary') }}">Report Summary</a>
                 {% endif %}
+                <a href="{{ url_for('profile') }}">Profile</a>
                 <a href="{{ url_for('logout') }}">Log out</a>
             </div>
         </div>
@@ -68,7 +85,7 @@
        <!-- The Grid Container that loops through all SQLite dishes -->
         <div class="dish-container" id="dishContainer">
             {% for dish in dishes %}
-            <div class="dish-card" data-rating="{{ dish['rating'] }}" data-price="{{ dish['price'] }}" >
+            <div class="dish-card" data-rating="{{ dish.avg_rating }}" data-price="{{ dish['price'] }}" data-category="{{ dish['category'] }}" >
                 <!-- Dish Picture Preview -->
                 <div class="dish-picture">
                     {% if dish["image_filename"] %}
@@ -83,10 +100,29 @@
                 </div>
                 <!-- Database Columns injected dynamically -->
                 <h2>{{ dish['name'] }}</h2>
+                <!-- Rating Stars Added Here -->
+                <div style="font-size: 16px; color: #f39c12; margin-left: 20px;   margin-top: 10px;">
+                    {% set rating_val = (dish['avg_rating'] or 0) | round(0, 'common') | int %}
+                    {% for i in range(1, 6) %}
+                        {% if i <= rating_val %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+                    {% endfor %}
+                    <span style="color: #555; font-size: 14px; margin-left: 6px;">
+                    ({{ "%.1f"|format(dish['avg_rating'] or 0) }})
+        </span>
+    </div>
                 <p><b>Category:</b> {{ dish['category'] }}</p>
                 <p><b>Price:</b> RM {{ dish['price'] }}</p>
                 <p><b>Calories:</b> {{ dish['calories'] }} kcal</p>
-                <p><b>Availability:</b> {{ dish['availability'] }}</p>
+                <p>
+                    <b>Availability:</b>
+                    <span class="{% if dish['availability'] == 'Yes' %}status-available{% else %}status-unavailable{% endif %}">
+                        {{ dish['availability'] }}
+                    </span>
+                </p>
             </div>
             {% else %}
                 <p>No dishes found in the database yet!</p>
@@ -95,4 +131,7 @@
     </main>
     <script src="../static/javascript/index.js"></script>
 </body>
+    <footer id="ds-footer">
+        <p>&copy; 2026 DishScope. All rights reserved.</p>
+    </footer>
 </html>
