@@ -23,7 +23,7 @@ def require_login():
     public_endpoints = ['login', 'register', 'static', 'home', 'verify_email','reset_password' ] 
 
     # Routes that ONLY vendors are allowed to access
-    vendor_endpoints = ['add_dish', 'edit_dish', 'menu_management', 'report summary']
+    vendor_endpoints = ['add_dish', 'edit_dish', 'menu_management', 'report_summary']
 
     # If the current request endpoint requires login and user session is missing
     if request.endpoint and request.endpoint not in public_endpoints:
@@ -743,9 +743,6 @@ def report_summary():
                             total_reviews=total_reviews, highest_rated=highest_rated, most_reviewed=most_reviewed)
 
 
-@app.route("/report summary", methods=["GET", "POST"])
-def report_summary():
-    return render_template("report summary.html") 
 
 
 @app.route("/review rating", methods=["GET", "POST"])
