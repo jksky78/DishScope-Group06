@@ -103,3 +103,101 @@
     <script src="../static/javascript/index.js"></script>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dish View Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dishpage.css') }}">
+</head>
+<body>
+    <div class="page">
+        <!-- Top section -->
+        <div class="top-section">
+            <h1>Welcome back, {{ user['name'] }} !</h1>
+            <p style="color: #6b7280; font-size: 20px;">
+                {% if session.get('role') == 'vendor' %}
+                    Ready to update your menu? Your dishes and reports are right here.
+                    <p class="secondary-text" >(You can add, edit, and manage your dishes anytime via the menu panel.)</p>
+                {% else %}
+                    Not sure what to eat? Discover and explore different kinds of campus dishes today.
+                {% endif %}
+                
+            </p>
+            <input 
+                type="text"
+                id="searchbar" 
+                class="search-bar" 
+                placeholder="Search bar: (type here)"
+            >
+            <div class="controls">
+        <div class="filter-wrapper" style="display: flex; align-items: center; gap: 10px;">
+            <label for="filterSelect" style="font-weight: bold;">Filter by:</label>
+            <select id="filterSelect">
+                <option value="all">Default</option>
+                <option value="main">Main Dish</option>
+                <option value="Side">Side Dish</option>
+                <option value="dessert">Dessert</option>
+        </select>
+            <label for="filterSelect" style="font-weight: bold;">Sort by:</label>
+            <select id="sortSelect">
+                <option value="all">Default</option>
+                <option value="priceLow">Lowest Price</option>
+                <option value="priceHigh">Highest Price</option>
+                <option value="ratingLow">Lowest Rating</option>
+                <option value="ratingHigh">Highest Rating</option>
+    </select>
+        </div>
+
+    </div>
+            <!-- Profile icon -->
+             <a href="{{ url_for('profile') }}" style="display: block; width: fit-content; text-decoration: none;">
+                <div class="avatar">
+                    {{ user['name'][0] | upper }}
+            </div>
+
+             </a>
+        </div>
+
+    <header class="navbar">
+
+        <h1>DishScope</h1>
+        <nav class="nav-menu">
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▼</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('dish_view') }}">View Dish</a>
+                {% if session.get('role') == 'vendor' %}
+                    <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                    <a href="{{ url_for('menu_management') }}">Menu Management</a>
+                    <a href="{{ url_for('report_summary') }}">Report Summary</a>
+                {% endif %}
+                <a href="{{ url_for('profile') }}">Profile</a>
+                <a href="{{ url_for('logout') }}">Log out</a>
+            </div>
+        </div>
+    </nav>
+
+
+    </header>
+    <!-- Main Content Wrapper -->
+    <main class="main-content">
+
+       <!-- The Grid Container that loops through all SQLite dishes -->
+        <div class="dish-container" id="dishContainer">
+            {% for dish in dishes %}
+            <div class="dish-card" data-rating="{{ dish.avg_rating }}" data-price="{{ dish['price'] }}" data-category="{{ dish['category'] }}" >
+                <!-- Dish Picture Preview -->
+                <div class="dish-picture">
+                    {% if dish["image_filename"] %}
+  
+                    <a href="{{ url_for('dish_detail', dish_id=dish['id']) }}">
+                        <img src="{{ url_for('static', filename='img/' + dish['image_filename']) }}" alt="Uploaded Profile Picture" width="300" style="border-radius: 8px;">
+
+                    </a> 
+                    {% else %}
+                        <p>No profile picture available.</p>
+                    {% endif %}
+                </div>

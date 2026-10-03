@@ -649,3 +649,102 @@
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{{ dish['name'] }}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dish_detail.css') }}">
+    <header>
+        <h1>DishScope</h1>
+        <nav class="nav-menu">
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▼</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('dish_view') }}">View Dish</a>
+                {% if session.get('role') == 'vendor' %}
+                    <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                    <a href="{{ url_for('menu_management') }}">Menu Management</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    </header>
+</head>
+
+
+<body>
+
+    <div class="page">
+
+        <!-- BACK BUTTON -->
+
+        <a href="{{ url_for('dish_view') }}" class="back-button">
+            ← Back to dishes
+        </a>
+
+
+        <!-- DISH TITLE -->
+
+        <h1>{{ dish['name'] }}</h1>
+
+
+        <!-- DISH IMAGE -->
+
+        <div class="dish-image">
+
+            {% if dish['image_filename'] %}
+
+                <img
+                    src="{{ url_for('static', filename='img/' + dish['image_filename']) }}"
+                    alt="{{ dish['name'] }}"
+                >
+
+            {% else %}
+
+                <div class="no-image">
+                    Picture
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- BASIC INFORMATION -->
+
+        <div class="basic-info">
+
+            <p>
+                <b>Category:</b>
+                {{ dish['category'] }}
+            </p>
+
+            <p>
+                <b>Price:</b>
+                RM {{ dish['price'] }}
+            </p>
+
+            <p>
+                <b>Vendor:</b>
+                {{ vendor['vendor_name'] }}
+            </p>
+
+            <p>
+                <b>Availability:</b>
+                {{ dish['availability'] }}
+            </p>
+            <p>
+                <b>Ingredients:</b>
+                {{ dish['ingredients'] }}
+            </p>
+        </div>
