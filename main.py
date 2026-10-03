@@ -13,6 +13,27 @@ app.secret_key = "DishScope-000"
 UPLOAD_FOLDER = 'static/img'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+def flash_once(message, category="message"):
+    session.pop('_flashes', None)
+    flash(message, category)
+@app.before_request
+def require_login():
+    print("CURRENT ENDPOINT:", request.endpoint)
+    # Route endpoints that anyone is allowed to visit without logging in
+    public_endpoints = ['login', 'register', 'static', 'home', 'verify_email','reset_password' ] 
+
+    # Routes that ONLY vendors are allowed to access
+    vendor_endpoints = ['add_dish', 'edit_dish', 'menu_management', 'report summary']
+
+    # If the current request endpoint requires login and user session is missing
+    if request.endpoint and request.endpoint not in public_endpoints:
+        if not session.get('logged_in'):
+            flash_once('You must be logged in to view that page.', 'danger')
+            return redirect(url_for('home', error="You do not have access to this page, please log in"))
+    # 2. Check if the page requires vendor access, but the user is a student
+    if request.endpoint in vendor_endpoints and session.get('role') != 'vendor':
+        flash_once('Access denied. You must be logged in as a vendor to access this page.', 'danger')
+        return redirect(url_for('home'))
 
 @app.get("/")
 def home ():
@@ -115,7 +136,28 @@ def register():
         table_email = request.form.get("email")
         table_vendor_name = request.form.get("vendor_name")
         table_vendor_location = request.form.get("vendor_location")
+        
+         # Check existing name
+        cursor.execute("SELECT * FROM users WHERE name = ?", (table_username,))
+        if cursor.fetchone():
+            connection.close()
+            flash_once("Username already taken.", "error")
+            return redirect(url_for('register'))
 
+        # Check existing email
+        cursor.execute("SELECT * FROM users WHERE email = ?", (table_email,))
+        if cursor.fetchone():
+            connection.close()
+            flash_once("Email already registered.", "error")
+            return redirect(url_for('register'))
+
+        # Check Vendor name
+        cursor.execute("SELECT * FROM vendors WHERE vendor_name = ?", (table_vendor_name,))
+        if cursor.fetchone():
+            connection.close()
+            flash_once("Vendor name already chosen.", "error")
+            return redirect(url_for('register'))
+        
         if not table_username:
             error_name = "Username is required"
             return render_template("register.html", error_name=error_name)
@@ -160,7 +202,8 @@ def register():
 
             # Close the connection
             conn.close()
-            return render_template("homepage.html")
+            flash_once("Registration successful! Please log in.", "success")
+            return redirect(url_for('home'))
     
 
 
@@ -172,16 +215,15 @@ def login():
         
         connection = sqlite3.connect('test.db')
         cursor = connection.cursor()
-        table_username = (request.form.get("name",) or "").strip()
+        table_username_email = (request.form.get("name",) or "").strip()
         table_password = (request.form.get("password") or "").strip()
-        table_email = request.form.get("email")
-        sql = "SELECT id, name, password, role FROM users WHERE name = ?"
-        cursor.execute(sql, (table_username,))
+        sql = "SELECT id, name, password, role FROM users WHERE name = ? OR email = ?"
+        cursor.execute(sql, (table_username_email, table_username_email))
         result = cursor.fetchone()
-        print("Entered username:", table_username)
+        print("Entered username or email:", table_username_email)
         print("Entered password:", table_password)
         print("Result:", result)
-
+        
         
         if result and check_password_hash(result[2], table_password):
 
@@ -228,7 +270,8 @@ def verify_email():
             return render_template("change-pass.html")
 
         else:
-            print("Email does not exist")
+            flash_once('Email not found in our system. Please check and try again.', 'danger')
+            return redirect(url_for('verify_email'))
 
         connection.close()
 
@@ -393,8 +436,13 @@ def dish_view():
         cursor = conn.cursor()
         try:
         # Try to fetch all dishes from the table
-            cursor.execute("SELECT * FROM dishes")
-            dishes = cursor.fetchall()  # Grab all rows
+            cursor.execute("""
+                SELECT dishes.*, COALESCE(AVG(reviews.rating), 0) AS avg_rating
+                FROM dishes 
+                LEFT JOIN reviews ON dishes.id = reviews.dish_id 
+                GROUP BY dishes.id
+            """)
+            dishes = cursor.fetchall() # Grab all rows
             print("ALL DISHES FOUND:", dishes)
         except sqlite3.OperationalError:
             print("DATABASE ERROR:")
@@ -406,7 +454,7 @@ def dish_view():
         return render_template("dishpage.html", dishes=dishes, user=user)
     else:
         print("You dont have access to this page")
-        flash('You must be logged in to view that page.', 'danger')
+        flash_once('You must be logged in to view that page.', 'danger')
         return redirect(url_for('home', error="You do not have access to this page, please log in"))
         
 
@@ -490,7 +538,7 @@ def profile():
     conn.row_factory = (sqlite3.Row)
     cursor = conn.cursor()
     user_id = session.get('user_id')
-# 1. HANDLE POST (When user clicks Save/Submit)
+    # HANDLE POST (When user clicks Save/Submit)
     if request.method == "POST":
         new_name = request.form.get('name')
     
@@ -511,7 +559,7 @@ def profile():
         conn.close()
         
         # Refresh the page to show updated info
-        flash("Profile updated successfully!", "success")
+        flash_once("Profile updated successfully!", "success")
         return redirect(url_for('profile'))
     user = cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
     print(session['user_id'])
@@ -529,14 +577,13 @@ def add_review(dish_id):
     comment = request.form.get('comment')
  
     if not rating:
-        print("failed")
-        flash("Please select a star rating!", "danger")
+        print("failed: no rating selected")
+        flash_once("Please select a star rating!", "danger")
         return redirect(url_for('dish_detail', dish_id=dish_id))
     
     rating_int = int(rating)
     
-
-    # Fetch student name from test.db
+    # 1. Fetch student name from test.db
     conn_users = sqlite3.connect("test.db")
     conn_users.row_factory = sqlite3.Row
     cursor_users = conn_users.cursor()
@@ -545,22 +592,156 @@ def add_review(dish_id):
     
     student_name = student['name'] if student else "Anonymous"
     
-    # Save into dish_database.db's reviews table
+    # 2. Save review into dish_database.db
     conn = sqlite3.connect("dish_database.db")
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO reviews (dish_id, user_id, student_name, rating, comment)
         VALUES (?, ?, ?, ?, ?)
     """, (dish_id, user_id, student_name, rating_int, comment))
-    print("Success")
- 
     
-    #  Get all reviews belonging to this dish
-    reviews = cursor.execute('SELECT * FROM reviews WHERE dish_id = ? ORDER BY id DESC', (dish_id,)).fetchall()
     conn.commit()
     conn.close()
-    print("SUCCESS")
-    return redirect(url_for('dish_detail', dish_id=dish_id, reviews=reviews))
+    print("SUCCESS: Review saved to database")
+    
+    flash_once("Review added successfully!", "success")
+    return redirect(url_for('dish_detail', dish_id=dish_id))
+
+@app.route('/delete_dish/<int:dish_id>', methods=['POST'])
+def delete_dish(dish_id):
+    # Check the specific vendor with id
+    conn = sqlite3.connect("test.db")
+    conn.row_factory = (sqlite3.Row)
+    cursor = conn.cursor()
+    user_id = session.get('user_id')
+    conn.close()
+    # Ensure user is logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+        
+    user_id = session.get('user_id')
+
+    # Connect to the dish database
+    conn = sqlite3.connect("dish_database.db")
+    cursor = conn.cursor()
+
+     # Delete the selected dish created by the specific vendor
+    cursor.execute("DELETE FROM dishes WHERE id = ? AND vendor_id = ?", (dish_id, user_id))
+    
+    conn.commit()
+    conn.close()
+
+    # Redirect back to the menu management page
+    return redirect(url_for('menu_management')) 
+
+@app.route('/dish/<int:dish_id>/edit', methods=['GET', 'POST'])
+def edit_dish(dish_id):
+    conn = sqlite3.connect("test.db")
+    conn.row_factory = (sqlite3.Row)
+    cursor = conn.cursor()
+    user_id = session.get('user_id')
+    conn.close()
+
+    conn = sqlite3.connect("dish_database.db")
+    conn.row_factory = (sqlite3.Row)
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+            # 1. Grab all text/dropdown inputs from the form
+            name = request.form.get('name')
+            category = request.form.get('category')
+            price = request.form.get('price')
+            spicy_level = request.form.get('spicy_level')
+            calories = request.form.get('calories')
+            ingredients = request.form.get('ingredients')
+            allergens = request.form.get('allergens')
+            is_available = request.form.get('availability')
+    
+            # 2. Check if a new image file was uploaded
+            file = request.files['file']
+            if file and file.filename != '':
+                filename = secure_filename(file.filename)
+                unique_filename = f"{uuid.uuid4()}_{filename}"
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                file.save(filepath)
+    
+    
+                # 3. UPDATE including the new image filename
+                cursor.execute('''
+                    UPDATE dishes 
+                    SET name = ?, category = ?, price = ?, spicy_level = ?, 
+                        allergens = ?, availability = ?, image_filename = ?, calories = ?,
+                        ingredients = ?
+                    WHERE id = ? AND vendor_id = ?
+                ''', (name, category, price, spicy_level, allergens, is_available, unique_filename, calories, ingredients, dish_id, user_id))
+                dish = cursor.execute("SELECT * FROM dishes where id = ? AND vendor_id = ?", (dish_id, user_id)).fetchone()
+            else:
+                # 4. UPDATE WITHOUT touching the image column (keeps the existing image safe if no new one was chosen)
+                cursor.execute('''
+                    UPDATE dishes 
+                    SET name = ?, category = ?, price = ?, spicy_level = ?, 
+                        allergens = ?, availability = ?, calories = ?, ingredients = ?
+                    WHERE id = ? AND vendor_id = ?
+                ''', (name, category, price, spicy_level, allergens, is_available, calories, ingredients, dish_id, user_id))
+                dish = cursor.execute("SELECT * FROM dishes where id = ? AND vendor_id = ?", (dish_id, user_id)).fetchone()
+            conn.commit()
+            conn.close()
+    
+            flash_once("Dish updated successfully!", "success")
+            return redirect(url_for('edit_dish', dish_id=dish_id))
+
+    dish = cursor.execute("SELECT * FROM dishes WHERE id = ? AND vendor_id = ?", (dish_id, user_id)).fetchone()
+    conn.close()
+    return render_template("edit_dish.html", dish=dish)
+
+@app.route('/report_summary', methods=['POST', 'GET'])
+def report_summary():
+    conn = sqlite3.connect("test.db")
+    conn.row_factory = (sqlite3.Row)
+    cursor = conn.cursor()
+    user_id = session.get('user_id')
+    vendor = cursor.execute('SELECT * FROM vendors WHERE id = ?', (user_id,)).fetchone()
+    conn.close()
+        # Connect dish database next
+    conn = sqlite3.connect("dish_database.db")
+    conn.row_factory = (sqlite3.Row) 
+    cursor = conn.cursor()
+    
+    total_dishes = cursor.execute("SELECT COUNT(*) FROM dishes WHERE vendor_id = ?", (user_id,)).fetchone()[0]
+
+    # Total review on the dish
+    total_reviews = cursor.execute("""
+        SELECT COUNT(reviews.id) AS total_reviews 
+        FROM reviews 
+        JOIN dishes ON reviews.dish_id = dishes.id 
+        WHERE dishes.vendor_id = ?
+    """, (user_id,)).fetchone()['total_reviews']
+
+    # Highest rated dish
+    highest_rated = cursor.execute("""
+        SELECT dishes.name, dishes.image_filename, AVG(reviews.rating) AS avg_rating 
+        FROM dishes 
+        LEFT JOIN reviews ON dishes.id = reviews.dish_id 
+        WHERE dishes.vendor_id = ? 
+        GROUP BY dishes.id 
+        ORDER BY avg_rating DESC 
+        LIMIT 1
+    """, (user_id,)).fetchone()
+
+    most_reviewed = cursor.execute("""
+        SELECT dishes.name, dishes.image_filename, COUNT(reviews.id) AS review_count 
+        FROM dishes 
+        LEFT JOIN reviews ON dishes.id = reviews.dish_id 
+        WHERE dishes.vendor_id = ? 
+        GROUP BY dishes.id 
+        ORDER BY review_count DESC 
+        LIMIT 1
+    """, (user_id,)).fetchone()
+
+
+    return render_template("report summary.html", vendor=vendor, total_dishes=total_dishes,
+                            total_reviews=total_reviews, highest_rated=highest_rated, most_reviewed=most_reviewed)
+
 
 @app.route("/report summary", methods=["GET", "POST"])
 def report_summary():
