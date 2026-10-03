@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Add New Dish</title>
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
     <header>
         <h1>DishScope</h1>
         <nav class="nav-menu">
@@ -11,7 +11,11 @@
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
                 <a href="{{ url_for('dish_view') }}">View Dish</a>
-                <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                {% if session.get('role') == 'vendor' %}
+                    <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                    <a href="{{ url_for('menu_management') }}">Menu Management</a>
+                    <a href="{{ url_for('report_summary') }}">Report Summary</a>
+                {% endif %}
                 <a href="{{ url_for('logout') }}">Log out</a>
             </div>
         </div>
@@ -43,17 +47,22 @@
 
                     <div class="form-group">
                         <label>Category:</label>
-                        <input type="text" name="category" required>
+                        <select id="category" name="category" required>
+                            <option value="" disabled selected>Select a category</option>
+                            <option value="Main">Main dish</option>
+                            <option value="Side">Side dish</option>
+                            <option value="Dessert">Dessert</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Price:</label>
+                        <label>Price (RM):</label>
                         <input type="number" step="0.5" name="price" required>
                     </div>
 
                     <div class="form-group">
                         <label>Description about dish:</label>
-                        <input type="text" name="description">
+                        <textarea id="description" name="description" rows="3" placeholder="e.g., A short description of the dish's main ingredients and taste."></textarea>
                     </div>
 
                     <div class="health-section">
@@ -65,7 +74,7 @@
                             </li>
                             <li>
                                 <label>Ingredients:</label>
-                                <input type="text" name="ingredients" required>
+                                <input type="text" name="ingredients" placeholder="e.g., Rice, chilli, peanuts, eggs" required>
                             </li>
                             <li>
                                 <label>Vegetarian status:</label>
@@ -85,7 +94,7 @@
                             </li>
                             <li>
                                 <label>Allergens:</label>
-                                <input type="text" name="allergens">
+                                <input type="text" name="allergens" placeholder="e.g., Peanuts, seafood, gluten (or 'None')">
                             </li>
                         </ul>
                     </div>
@@ -118,7 +127,6 @@
             <!-- Action Buttons -->
             <div class="form-actions">
                 <button type="submit" class="btn-add">Add Dish</button>
-                <button type="reset" class="btn-discard" onclick="clearPreview()">Discard Dish</button>
             </div>
 
         </form>
@@ -127,4 +135,7 @@
     <script src="../static/javascript/index.js">
     </script>
 </body>
+    <footer id="ds-footer">
+        <p>&copy; 2026 DishScope. All rights reserved.</p>
+    </footer>
 </html>

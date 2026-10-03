@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>profile</title>
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
     <header>
         <h1>DishScope</h1>
         
@@ -13,16 +13,15 @@
         <div class="dropdown">
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
-                <a href="{{ url_for('dish_view') }}">Dish View</a>
+                <a href="{{ url_for('dish_view') }}">View Dish</a>
                 {% if session.get('role') == 'vendor' %}
-                    <a href="{{ url_for('menu_management') }}">Menu Management</a>
                     <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                    <a href="{{ url_for('menu_management') }}">Menu Management</a>
+                    <a href="{{ url_for('report_summary') }}">Report Summary</a>
                 {% endif %}
-                {% if session.get('logged_in') %}
+                    <a href="{{ url_for('profile') }}">Profile</a>
                     <a href="{{ url_for('logout') }}">Logout</a>
-                {% else %}
-                    <a href="{{ url_for('login') }}">Login</a>
-                {% endif %}
+
             </div>
         </div>
     </nav>
@@ -46,7 +45,7 @@
                 {% endfor %}
             {% endif %}
             {% endwith %}
-            <div class="avatar">
+            <div class="avatar" >
                 {{ user['name'][0] | upper }}
             </div>
             <div class="field-group">
@@ -85,4 +84,7 @@
     </form>
 
 </body>
+    <footer id="ds-footer">
+        <p>&copy; 2026 DishScope. All rights reserved.</p>
+    </footer>
 </html>

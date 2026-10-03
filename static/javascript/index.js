@@ -131,16 +131,16 @@ sortSelect.addEventListener("change", function () {
 // ================================
 // MAIN FUNCTION
 // ================================
-
+const originalOrder = Array.from(dishCards);
 function updateDishes() {
 
     const searchText = searchBar.value.toLowerCase().trim();
 
-    const selectedFilter = filterSelect.value;
+    const selectedFilter = filterSelect.value.toLowerCase().trim();
 
     const selectedSort = sortSelect.value;
-
-
+    const originalOrder = Array.from(dishCards);
+    console.log("Selected Dropdown Filter:", selectedFilter);
     // --------------------------------
     // FILTER
     // --------------------------------
@@ -150,9 +150,8 @@ function updateDishes() {
         const dishInformation =
             card.textContent.toLowerCase();
 
-        const category =
-            card.dataset.category;
-
+        const cardCategory = card.dataset.category ? card.dataset.category.toLowerCase() : "";
+        console.log("Card category found in HTML:", cardCategory);
 
         let matchesSearch =
             dishInformation.includes(searchText);
@@ -164,7 +163,7 @@ function updateDishes() {
         if (selectedFilter !== "all") {
 
             matchesFilter =
-                category === selectedFilter;
+                cardCategory.includes(selectedFilter);
 
         }
 
@@ -184,67 +183,37 @@ function updateDishes() {
     });
 
 
+// --------------------------------
+    // SORT (
     // --------------------------------
-    // SORT
-    // --------------------------------
 
+    
+    const cardsArray = Array.from(dishCards);
 
-    if (selectedSort === "priceLow") {
-
-        dishCards.sort(function (a, b) {
-
-            return Number(a.dataset.price) -
-                   Number(b.dataset.price);
-
-        });
-
-    }
-
-
-    else if (selectedSort === "priceHigh") {
-
-        dishCards.sort(function (a, b) {
-
-            return Number(b.dataset.price) -
-                   Number(a.dataset.price);
-
-        });
-
-    }
-
-
-    else if (selectedSort === "ratingLow") {
-
-        dishCards.sort(function (a, b) {
-
-            return Number(a.dataset.rating) -
-                   Number(b.dataset.rating);
-
-        });
-
-    }
-
-
-    else if (selectedSort === "ratingHigh") {
-
-        dishCards.sort(function (a, b) {
-
-            return Number(b.dataset.rating) -
-                   Number(a.dataset.rating);
-
-        });
-
-    }
-
-
-    // Put cards back into the container
-
-    dishCards.forEach(function (card) {
-
-        dishContainer.appendChild(card);
-
+    cardsArray.sort(function (a, b) {
+        if (selectedSort === "all") {
+            
+            return originalOrder.indexOf(a) - originalOrder.indexOf(b);
+        } 
+        else if (selectedSort === "priceLow") {
+            return Number(a.dataset.price) - Number(b.dataset.price);
+        } 
+        else if (selectedSort === "priceHigh") {
+            return Number(b.dataset.price) - Number(a.dataset.price);
+        } 
+        else if (selectedSort === "ratingLow") {
+            return Number(a.dataset.rating) - Number(b.dataset.rating);
+        } 
+        else if (selectedSort === "ratingHigh") {
+            return Number(b.dataset.rating) - Number(a.dataset.rating);
+        }
+        return 0;
     });
 
+    
+    cardsArray.forEach(function (card) {
+        dishContainer.appendChild(card);
+    });
 }
 
 
@@ -268,4 +237,22 @@ function clearPreview() {
     document.getElementById('preview').style.display = 'none';
     document.getElementById('preview-text').style.display = 'block';
         }
+
+
+function previewImageEdit(event) {
+    const input = event.target;
+    const preview = document.getElementById('editImagePreview');
+
+  
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 
