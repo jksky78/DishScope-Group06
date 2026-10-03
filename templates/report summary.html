@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Summary (Vendor Only)</title>
+<style>
+/* ================================================================
+   DishScope - vendor report page
+   Same selectors as before, restyled to match style2.css / dishpage.css.
+   ================================================================ */
+
+/* ---- Typefaces ---- */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---- Design tokens (from style2.css) ---- */
+:root {
+    --bg:           #f5f7ff;
+    --bg-2:         #eef1fa;
+    --surface:      #ffffff;
+    --surface-2:    #f8f9fc;
+
+    --indigo:       #5b5ce2;
+    --indigo-d:     #4345c8;
+    --indigo-50:    #eeeefc;
+    --indigo-100:   #ddddfb;
+    --indigo-200:   #c4c4f7;
+    --indigo-400:   #8f90ec;
+
+    --text:         #0c0d1a;
+    --text-2:       #1e2035;
+    --text-muted:   #6b7090;
+    --text-light:   #9fa3c0;
+
+    --border:       #e3e5f0;
+    --border-2:     #cdd0e4;
+    --shadow-xs:    0 1px 3px rgba(12,13,26,0.06);
+    --shadow-sm:    0 2px 8px rgba(12,13,26,0.07), 0 1px 3px rgba(12,13,26,0.05);
+    --shadow-md:    0 6px 20px rgba(12,13,26,0.08), 0 2px 6px rgba(12,13,26,0.04);
+    --shadow-lg:    0 16px 48px rgba(12,13,26,0.10), 0 4px 14px rgba(12,13,26,0.05);
+    --shadow-btn:   0 6px 20px rgba(91,92,226,0.30);
+
+    --danger:       #e53e3e;
+    --success:      #0d9f6e;
+    --amber:        #e8a020;
+    --white:        #ffffff;
+
+    --header-h:     64px;
+    --radius-sm:    10px;
+    --radius-md:    14px;
+    --radius-lg:    20px;
+    --radius-xl:    26px;
+    --radius-pill:  999px;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Form controls ignore the page font by default, so make them inherit it */
+input,
+select,
+textarea,
+button {
+    font-family: inherit;
+}
+
+/* ---- Body ---- */
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(ellipse 90% 45% at 50% 0%, rgba(91,92,226,0.09) 0%, transparent 65%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 14px;
+    padding: 20px;
+    padding-top: calc(var(--header-h) + 20px);   /* clears the fixed header */
+}
+
+/* ---- Header ---- */
+header {
+    background-color: #ffffff;               /* fallback if variables fail */
+    background-color: var(--surface, #ffffff);
+    color: var(--text, #0c0d1a);
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: var(--header-h);
+    padding: 0 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-xs);
+}
+
+/* Brand wordmark */
+header h1 {
+    margin: 0;                        /* cancels the global h1 margin above */
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    background: linear-gradient(125deg, var(--indigo) 0%, var(--indigo-400) 55%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: transparent;
+    padding: 15px 30px;
+    color: #ffffff;
+}
+/* ================================================================
+   FOOTER
+   ================================================================ */
+#ds-footer {
+    width: 100%;
+    padding: 20px 32px;
+    text-align: center;
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: var(--text-light);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+    letter-spacing: 0.01em;
+}
+/* ---- Nav / dropdown ---- */
+.nav-menu {
+    position: relative;
+}
+
+.dropdown {
+    position: relative;
+}
+
+/* Keeps the menu open while the mouse moves from button to menu */
+.dropdown::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 100%;
+    height: 12px;
+    pointer-events: auto;
+}
+
+.dropbtn {
+    background: var(--indigo-50);
+    color: var(--indigo);
+    padding: 8px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border: 1px solid var(--indigo-100);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    letter-spacing: 0.005em;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.dropbtn:hover,
+.dropbtn:focus-visible {
+    background: var(--indigo-100);
+    border-color: var(--indigo-200);
+    outline: none;
+}
+
+.dropbtn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(91,92,226,0.22);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    background: var(--surface);
+    min-width: 196px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    z-index: 1001;
+    padding: 6px;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 9px 14px;
+    color: var(--text-2);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: background 0.12s, color 0.12s;
+}
+
+.dropdown-content a:hover,
+.dropdown-content a:focus-visible {
+    background: var(--indigo-50);
+    color: var(--indigo);
+    outline: none;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Logo styling */
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+/* ---- Misc shared pieces (same names as before) ---- */
+.alert-danger {
+    color: #c53030;
+}
+
+.toggle_box {
+    width: 225px;
+    margin: 35px auto;
+    position: relative;
+    border-radius: 30px;
+    background-color: var(--indigo-50);
+}
+
+.toggle_button {
+    padding: 10px 30px;
+    cursor: pointer;
+    border: 0;
+    position: relative;
+    text-align: center;
+    outline: none;
+    background: transparent;
+    color: var(--indigo);
+    font-weight: 600;
+}
+
+.btn-edit {
+    display: flex;
+    gap: 10px;
+}
+
+/* ================================================================
+   REPORT PAGE
+   ================================================================ */
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--surface);
+    padding: 32px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+/* ---- Plain text inside the page ----
+   The reset above removes the browser's default spacing, so headings,
+   paragraphs and lists get their spacing back here. */
+.container h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 2.1rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 16px;
+}
+
+.container h2 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text);
+    margin: 28px 0 10px;
+}
+
+.container h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-2);
+    margin: 20px 0 8px;
+}
+
+.container p {
+    margin-bottom: 8px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+.container ul,
+.container ol {
+    padding-left: 22px;
+    margin-bottom: 12px;
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+.container strong,
+.container b {
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* ---------- buttons ---------- */
+.btn-primary,
+button {
+    padding: 9px 18px;
+    background: linear-gradient(140deg, var(--indigo) 0%, var(--indigo-d) 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    font-family: inherit;
+    transition: filter 0.18s, transform 0.18s;
+}
+.btn-primary:hover,
+button:hover { filter: brightness(1.08); }
+.btn-success { background: var(--success); }
+.btn-success:hover { background: var(--success); filter: brightness(0.92); }
+
+.header-actions {
+    margin-bottom: 24px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ---------- vendor bar ---------- */
+.vendor-bar {
+    background: var(--indigo-50);
+    border: 1px solid var(--indigo-100);
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.vendor-bar label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--indigo-d);
+}
+.vendor-bar select {
+    padding: 9px 16px;
+    border: 1px solid var(--indigo-100);
+    border-radius: var(--radius-pill);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-2);
+    background: var(--surface);
+    min-width: 200px;
+    cursor: pointer;
+    outline: none;
+}
+
+/* ---------- summary boxes ---------- */
+.summary-section { margin-bottom: 30px; }
+.section-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin: 0 0 12px;
+    color: var(--text);
+}
+.summary-boxes { display: flex; gap: 20px; flex-wrap: wrap; }
+.summary-box {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    min-width: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+}
+.summary-label { font-size: 13px; color: var(--text-muted); }
+.summary-value {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--indigo);
+}
+
+/* ---------- main grid ---------- */
+.report-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+@media (max-width: 900px) {
+    .report-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- left column: dish cards ---------- */
+.left-col {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+.card-section-title {
+    font-size: 15px;
+    color: var(--text-2);
+    margin: 0 0 10px;
+    font-weight: 600;
+}
+.dish-card-vendor {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 10px;
+}
+.dish-card-vendor img {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background: var(--bg-2);
+    flex-shrink: 0;
+}
+.dish-details {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+.dish-details p { margin: 0 0 4px; }
+.dish-details strong { color: var(--text); font-weight: 600; }
+.dish-details .avail-yes { color: var(--success); font-weight: 600; }
+.dish-details .avail-no { color: var(--danger); font-weight: 600; }
+.ratings-line {
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--text-2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.stars {
+    color: var(--amber);
+    font-size: 22px;
+    letter-spacing: 2px;
+}
+
+/* ---------- right column: chart ---------- */
+.chart-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 22px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+}
+.chart-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--text);
+    text-align: center;
+    margin: 0 0 20px;
+}
+.chart-body {
+    display: flex;
+    height: 220px;
+    gap: 8px;
+}
+.y-axis-title {
+    width: 14px;
+    flex-shrink: 0;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.y-axis {
+    position: relative;
+    width: 30px;
+    flex-shrink: 0;
+}
+.y-axis span {
+    position: absolute;
+    right: 0;
+    transform: translateY(50%);
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1;
+    white-space: nowrap;
+}
+.plot {
+    position: relative;
+    flex: 1;
+    border-left: 1px solid var(--border-2);
+    border-bottom: 1px solid var(--border-2);
+    min-width: 0;
+}
+.gridline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1px solid var(--bg-2);
+}
+.bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 0 10px;
+}
+.bar-col {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    min-width: 0;
+    position: relative;
+}
+.bar {
+    width: 100%;
+    max-width: 50px;
+    background: linear-gradient(180deg, #8b5cf6 0%, var(--indigo) 100%);
+    border-radius: 6px 6px 0 0;
+    min-height: 2px;
+    position: relative;
+}
+.bar-label {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-2);
+}
+.x-axis-labels {
+    display: flex;
+    gap: 12px;
+    padding: 0 10px;
+    margin-top: 6px;
+}
+.x-label {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.x-axis-title {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 8px;
+    padding-left: 46px;
+}
+.empty-note {
+    text-align: center;
+    color: var(--text-light);
+    padding: 30px 10px;
+    font-style: italic;
+    font-size: 13px;
+}
+.back-link {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+.back-link a {
+    color: var(--indigo);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+.back-link a:hover { text-decoration: underline; }
+
+/* ---- Responsive (header only) ---- */
+@media (max-width: 600px) {
+    header {
+        padding: 0 20px;
+    }
+
+    header h1 {
+        font-size: 1.3rem;
+    }
+}
+
+</style>
+<header>
+    <h1 class="header">DishScope</h1>
+        <nav class="nav-menu">
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▼</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('dish_view') }}">View Dish</a>
+                {% if session.get('role') == 'vendor' %}
+                    <a href="{{ url_for('add_dish') }}">Add Dish</a>
+                    <a href="{{ url_for('menu_management') }}">Menu Management</a>
+                    <a href="{{ url_for('report_summary') }}">Report Summary</a>
+                {% endif %}
+                <a href="{{ url_for('profile') }}">Profile</a>
+                <a href="{{ url_for('logout') }}">Log out</a>
+            </div>
+        </div>
+    </nav>
+    
+
+
+</header>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Report Summary (Vendor only)</h1>
+
+    <div class="header-actions">
+        <a href="{{ url_for('menu_management') }}" class="btn-primary">← Back to Menu Management</a>
+        <a href="{{ url_for('dish_view') }}" class="btn-primary">← Back to dish page</a>
+    </div>
+
+    <!-- ============================================================
+         VENDOR FILTER
+         ============================================================ -->
+    <div class="vendor-bar">
+        <label for="vendorSelector">Vendor Name:</label>
+        <span>{{ vendor['vendor_name'] }}</span>
+    </div>
+
+    <!-- ============================================================
+         REPORT SUMMARY BOXES
+         ============================================================ -->
+    <div class="summary-section">
+        <h2 class="section-title">Report summary:</h2>
+        <div class="summary-boxes">
+            <div class="summary-box">
+                <span class="summary-label">Total dish created:</span>
+                <span>{{ total_dishes }}</span>
+            </div>
+            <div class="summary-box">
+                <span class="summary-label">Total review from dish created:</span>
+                <span>{{ total_reviews }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MAIN GRID (CARDS + CHART)
+         ============================================================ -->
+    <div class="report-grid">
+
+        <!-- Left Column: Highest Rated & Most Reviewed -->
+        <div class="left-col">
+            <!-- Highest Rated -->
+                <div>
+                    <h3 class="card-section-title">Your Highest rated dish</h3>
+                    {% if highest_rated and highest_rated['name'] %}
+                        <p><strong>{{ highest_rated['name'] }}</strong> (Rating: {{ "%.1f"|format(highest_rated['avg_rating'] or 0) }})</p>
+                    <div class="image-preview-box"><img src="{{ url_for('static', filename='img/' + highest_rated['image_filename']) }}" alt="Uploaded Profile Picture" style="width: 300px; height: 230px; object-fit: cover; border-radius: 8px;"></div>
+                    {% else %}
+                    <p class="text-muted">No ratings yet.</p>
+                    <p>Ratings: ☆☆☆☆☆</p>
+                    {% endif %}
+                    <div id="highestRatedBox"></div>
+                    <div class="ratings-line">
+                        Ratings: 
+                        {% set rating_val = (highest_rated['avg_rating'] or 0) | round(0, 'common') | int %}
+                        {% for i in range(1, 6) %}
+                            {% if i <= rating_val %}
+                                ★
+                            {% else %}
+                                ☆
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                </div>
+        </div> 
+
+            <!-- Most Reviewed -->
+            <div>
+                <h3 class="card-section-title">Your Most reviewed dish:</h3>
+                <div id="chart-card">
+                    {% if most_reviewed and most_reviewed['name'] and most_reviewed['review_count'] > 0 %}
+            <!-- Display Dish Image -->
+                        <p><strong>{{ most_reviewed['name'] }}</strong></p>
+                        {% if most_reviewed['image_filename'] %}
+                            <div class="image-preview-box"><img src="{{ url_for('static', filename='img/' + most_reviewed['image_filename']) }}" alt="Uploaded Profile Picture" style="width: 300px; height: 230px; object-fit: cover; border-radius: 8px;"></div>
+                        {% endif %}
+
+                        <p>Total Reviews: <strong>{{ most_reviewed['review_count'] }} reviews</strong></p>
+                    {% else %}
+                        <p class="text-muted">No reviews yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Chart -->
+
+    </div>
+
+</div>
+
+<script>
+</script>
+
+</body>
+    <footer id="ds-footer">
+        <p>&copy; 2026 DishScope. All rights reserved.</p>
+    </footer>
+</html>

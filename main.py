@@ -441,6 +441,8 @@ def menu_management():
         
         return render_template("menu management.html", user=user, dishes=dishes, total_dishes=total_dishes,
                                total_availability=total_availability, total_unavailability=total_unavailability)
+
+
 @app.route("/dish/<int:dish_id>", methods=["GET", "POST"])
 def dish_detail(dish_id):
         print(f"Clicked Dish ID: {dish_id}")
@@ -475,6 +477,8 @@ def dish_detail(dish_id):
     
     # 3. Pass both 'dish' and 'vendor' to the template
         return render_template("dish detailed dashboard.html", dish=dish, vendor=vendor, reviews=reviews, total_reviews=total_reviews, avg_rating=avg_rating)
+
+
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     conn = sqlite3.connect("test.db")
