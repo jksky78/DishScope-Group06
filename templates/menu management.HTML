@@ -4,29 +4,276 @@
     <title>Menu Management</title>
     <style>
 
-        body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background: #f9f9f9;
+/* ================================================================
+   DishScope - vendor menu management page
+   Same selectors as before, restyled to match style2.css / dishpage.css.
+   ================================================================ */
+
+/* ---- Typefaces ---- */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---- Design tokens (from style2.css) ---- */
+:root {
+    --bg:           #f5f7ff;
+    --bg-2:         #eef1fa;
+    --surface:      #ffffff;
+    --surface-2:    #f8f9fc;
+
+    --indigo:       #5b5ce2;
+    --indigo-d:     #4345c8;
+    --indigo-50:    #eeeefc;
+    --indigo-100:   #ddddfb;
+    --indigo-200:   #c4c4f7;
+    --indigo-400:   #8f90ec;
+
+    --text:         #0c0d1a;
+    --text-2:       #1e2035;
+    --text-muted:   #6b7090;
+    --text-light:   #9fa3c0;
+
+    --border:       #e3e5f0;
+    --border-2:     #cdd0e4;
+    --shadow-xs:    0 1px 3px rgba(12,13,26,0.06);
+    --shadow-sm:    0 2px 8px rgba(12,13,26,0.07), 0 1px 3px rgba(12,13,26,0.05);
+    --shadow-md:    0 6px 20px rgba(12,13,26,0.08), 0 2px 6px rgba(12,13,26,0.04);
+    --shadow-lg:    0 16px 48px rgba(12,13,26,0.10), 0 4px 14px rgba(12,13,26,0.05);
+    --shadow-btn:   0 6px 20px rgba(91,92,226,0.30);
+
+    --danger:       #e53e3e;
+    --success:      #0d9f6e;
+    --amber:        #e8a020;
+    --white:        #ffffff;
+
+    --header-h:     64px;
+    --radius-sm:    10px;
+    --radius-md:    14px;
+    --radius-lg:    20px;
+    --radius-xl:    26px;
+    --radius-pill:  999px;
 }
+
+/* ---- Reset ---- */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+
+/* Form controls ignore the page font by default, so make them inherit it */
+input,
+select,
+textarea,
+button {
+    font-family: inherit;
+}
+
+/* ---- Body ---- */
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(ellipse 90% 45% at 50% 0%, rgba(91,92,226,0.09) 0%, transparent 65%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    padding-top: calc(var(--header-h) + 20px);   /* clears the fixed header */
+}
+
+/* ---- Header ---- */
+header {
+    background-color: #ffffff;               /* fallback if variables fail */
+    background-color: var(--surface, #ffffff);
+    color: var(--text, #0c0d1a);
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: var(--header-h);
+    padding: 0 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-xs);
+}
+
+/* Brand wordmark */
+header h1 {
+    margin: 0;                        /* cancels the global h1 margin above */
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    background: linear-gradient(125deg, var(--indigo) 0%, var(--indigo-400) 55%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: transparent;
+    padding: 15px 30px;
+    color: #ffffff;
+}
+
+/* ---- Nav / dropdown ---- */
+.nav-menu {
+    position: relative;
+}
+
+.dropdown {
+    position: relative;
+}
+
+/* Keeps the menu open while the mouse moves from button to menu */
+.dropdown::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 100%;
+    height: 12px;
+    pointer-events: auto;
+}
+
+.dropbtn {
+    background: var(--indigo-50);
+    color: var(--indigo);
+    padding: 8px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border: 1px solid var(--indigo-100);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    letter-spacing: 0.005em;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+/* ================================================================
+   FOOTER
+   ================================================================ */
+#ds-footer {
+    width: 100%;
+    padding: 20px 32px;
+    text-align: center;
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: var(--text-light);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+    letter-spacing: 0.01em;
+}
+.dropbtn:hover,
+.dropbtn:focus-visible {
+    background: var(--indigo-100);
+    border-color: var(--indigo-200);
+    outline: none;
+}
+
+.dropbtn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(91,92,226,0.22);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    background: var(--surface);
+    min-width: 196px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    z-index: 1001;
+    padding: 6px;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 9px 14px;
+    color: var(--text-2);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: background 0.12s, color 0.12s;
+}
+
+.dropdown-content a:hover,
+.dropdown-content a:focus-visible {
+    background: var(--indigo-50);
+    color: var(--indigo);
+    outline: none;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Logo styling */
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+/* ---- Misc shared pieces (same names as before) ---- */
+.alert-danger {
+    color: #c53030;
+}
+
+.toggle_box {
+    width: 225px;
+    margin: 35px auto;
+    position: relative;
+    border-radius: 30px;
+    background-color: var(--indigo-50);
+}
+
+.toggle_button {
+    padding: 10px 30px;
+    cursor: pointer;
+    border: 0;
+    position: relative;
+    text-align: center;
+    outline: none;
+    background: transparent;
+    color: var(--indigo);
+    font-weight: 600;
+}
+
+/* ================================================================
+   MENU MANAGEMENT PAGE
+   ================================================================ */
 
 .container {
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    background: #fff;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    background: var(--surface);
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
 }
 
-h1 {
-    color: #333;
-    font-size: 24px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-}
-
-/* Header Actions & Stats */
+/* Header actions & stats */
 .header-actions {
     margin-bottom: 20px;
     display: flex;
@@ -35,63 +282,73 @@ h1 {
 }
 
 .stats {
-    background: #e9ecef;
-    padding: 10px 15px;
-    border-radius: 4px;
+    background: var(--indigo-50);
+    color: var(--indigo-d);
+    border: 1px solid var(--indigo-100);
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
     display: inline-block;
     margin: 0;
 }
 
 .stats span {
     margin-right: 20px;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 /* Buttons */
-.btn-primary, 
+.btn-primary,
 button {
-    padding: 8px 16px;
-    background: #007bff;
-    color: white;
+    padding: 9px 18px;
+    background: linear-gradient(140deg, var(--indigo) 0%, var(--indigo-d) 100%);
+    color: #ffffff;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
     text-decoration: none;
     font-size: 14px;
+    font-weight: 600;
     display: inline-block;
+    transition: filter 0.18s, transform 0.18s;
 }
 
-.btn-primary:hover, 
+.btn-primary:hover,
 button:hover {
-    background: #0056b3;
+    filter: brightness(1.08);
 }
 
 button.danger {
-    background: #dc3545;
-    
+    background: var(--danger);
 }
 
 button.danger:hover {
-    background: #a71d2a;
+    filter: brightness(0.92);
 }
 
-button.secondary {
-    background: #6c757d;
+a.secondary {
+    background: var(--indigo-d);
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    color: white;
 }
 
-button.secondary:hover {
-    background: #5a6268;
+a.secondary:hover {
+    background: var(--indigo-200);
+    filter: none;
 }
 
 button.success {
-    background: #28a745;
+    background: var(--success);
 }
 
 button.success:hover {
-    background: #218838;
+    filter: brightness(0.92);
 }
 
-/* Card Grid */
+/* Card grid */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -100,56 +357,64 @@ button.success:hover {
 }
 
 .dish-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
     padding: 15px;
     text-align: center;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.dish-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 .dish-card img {
     width: 100%;
     height: 120px;
     object-fit: cover;
-    border-radius: 4px;
-    background: #eee;
+    border-radius: var(--radius-sm);
+    background: var(--bg-2);
     margin-bottom: 10px;
 }
 
 .dish-card h3 {
     margin: 5px 0;
-    font-size: 16px;
-    color: #333;
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--text);
 }
 
 .dish-card .price {
-    font-weight: bold;
-    color: #007bff;
+    font-weight: 700;
+    color: var(--indigo);
     margin-bottom: 5px;
 }
 
 .dish-card .vendor {
     font-size: 12px;
-    color: #666;
+    color: var(--text-muted);
     margin-bottom: 5px;
 }
 
 .dish-card .status {
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 10px;
 }
 
 .status.available {
-    color: green;
+    color: var(--success);
 }
 
 .status.unavailable {
-    color: red;
+    color: var(--danger);
 }
 
 .card-actions {
@@ -159,20 +424,22 @@ button.success:hover {
 }
 
 .card-actions button {
-    padding: 6px 12px;
+    padding: 6px 14px;
     font-size: 13px;
 }
 
-/* Edit Form Section */
+/* Edit form section */
 #editSection {
     margin-top: 30px;
-    border-top: 2px solid #eee;
+    border-top: 1px solid var(--border);
     padding-top: 20px;
 }
 
 #editSection h2 {
-    font-size: 18px;
-    color: #333;
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--text);
     margin-bottom: 15px;
 }
 
@@ -192,12 +459,13 @@ button.success:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-left: 1px solid #eee;
+    border-left: 1px solid var(--border);
     padding-left: 20px;
 }
 
 .edit-right label {
-    font-weight: bold;
+    font-weight: 600;
+    color: var(--text-2);
     margin-bottom: 10px;
     display: block;
     text-align: left;
@@ -207,14 +475,15 @@ button.success:hover {
 .image-preview-box {
     width: 150px;
     height: 150px;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
+    border: 2px dashed var(--indigo-200);
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 10px;
     overflow: hidden;
-    background: #fafafa;
+    background: var(--surface-2);
+    color: var(--text-light);
 }
 
 .image-preview-box img {
@@ -235,36 +504,49 @@ button.success:hover {
 
 .form-group label {
     width: 140px;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 14px;
+    color: var(--text-2);
 }
 
-.form-group input[type="text"], 
-.form-group input[type="number"], 
+.form-group input[type="text"],
+.form-group input[type="number"],
 .form-group select {
     flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fafaff;
+    color: var(--text);
     font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus {
+    border-color: var(--indigo-200);
+    box-shadow: 0 0 0 3px rgba(91,92,226,0.18);
 }
 
 .health-info-title {
     margin-top: 20px;
     margin-bottom: 10px;
-    font-size: 16px;
-    color: #333;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-2);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
 }
 
-/* Form Actions */
+/* Form actions */
 .form-actions {
     margin-top: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border);
     padding-top: 15px;
 }
 
@@ -274,11 +556,16 @@ button.success:hover {
 }
 
 .form-actions button {
-    padding: 10px 20px;
+    padding: 10px 22px;
     font-size: 14px;
 }
 
-/* Details Modal */
+.btn-edit {
+    display: flex;
+    gap: 10px;
+}
+
+/* Details modal */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -286,27 +573,32 @@ button.success:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(12,13,26,0.45);
+    backdrop-filter: blur(3px);
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 2000;
 }
 
 .modal-content {
-    background: #fff;
-    padding: 25px;
-    border-radius: 8px;
+    background: var(--surface);
+    padding: 28px;
+    border-radius: var(--radius-xl);
     width: 90%;
     max-width: 500px;
     max-height: 80vh;
     overflow-y: auto;
     position: relative;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-lg);
 }
 
 .modal-content h2 {
     margin-top: 0;
-    border-bottom: 2px solid #eee;
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
     padding-bottom: 10px;
 }
 
@@ -316,49 +608,65 @@ button.success:hover {
     right: 20px;
     font-size: 24px;
     cursor: pointer;
-    color: #888;
+    color: var(--text-light);
     background: none;
     border: none;
     padding: 0;
+    box-shadow: none;
 }
 
 .modal-content .close-btn:hover {
-    color: #000;
+    color: var(--text);
+    filter: none;
 }
 
 .detail-row {
     margin-bottom: 10px;
     font-size: 14px;
     display: flex;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
 }
 
 .detail-row strong {
     width: 140px;
     display: inline-block;
-    color: #555;
+    color: var(--text-muted);
+    font-weight: 600;
 }
 
 .detail-row span {
     flex: 1;
-    color: #333;
+    color: var(--text);
 }
 
 .modal-img {
     width: 100%;
     max-height: 200px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: var(--radius-md);
     margin-bottom: 15px;
+}
+
+/* ---- Responsive (header only) ---- */
+@media (max-width: 600px) {
+    header {
+        padding: 0 20px;
+    }
+
+    header h1 {
+        font-size: 1.3rem;
+    }
 }
        
        
 
     </style>
-    <header>
-        <h1 class="header">DishScope</h1>
+        <header>
+        <h1>DishScope</h1>
+        
         <nav class="nav-menu">
+        </div>
         <div class="dropdown">
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
@@ -368,11 +676,15 @@ button.success:hover {
                     <a href="{{ url_for('menu_management') }}">Menu Management</a>
                     <a href="{{ url_for('report_summary') }}">Report Summary</a>
                 {% endif %}
-                <a href="{{ url_for('profile') }}">Profile</a>
-                <a href="{{ url_for('logout') }}">Log out</a>
+                    <a href="{{ url_for('profile') }}">Profile</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+
+
             </div>
         </div>
     </nav>
+
+
 
 
     </header>
@@ -401,7 +713,6 @@ button.success:hover {
     <div id="editSection">
 
     <h2>Edit Dish (for vendor only)</h2>
-    <form id="editDishForm">
         <input type="hidden" id="editId">
         <div class="edit-layout">
             {% for dish in dishes %}
@@ -415,15 +726,20 @@ button.success:hover {
                             <span style="color: #28a745;">Availability: Yes</span>
                         {% endif %}
                     </p>
-                    <button type="button" class="secondary" onclick="document.getElementById('editImageUpload').click()" style="margin-bottom: 10px;">Edit</button>
-                    <button type="button" class="danger" onclick="document.getElementById('editImageUpload').click()" style="margin-bottom: 10px;">Delete</button>
+                    <a href="{{ url_for('edit_dish', dish_id=dish['id']) }}"
+                        class="secondary"
+                        style="margin-bottom: 10px; display: inline-block;">
+                        Edit
+                    </a>
+                    <form action="{{ url_for('delete_dish', dish_id=dish['id']) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this dish?');">
+                        <button type="submit" class="danger" style="margin-bottom: 10px;">Delete</button>
+                    </form>
                 </div>
             {% else %}
                 <p>No dishes found in the database yet!</p>
             {% endfor %}
         </div>
-        
-    </form>
+
 </div>
 </div>
 
@@ -454,4 +770,5 @@ button.success:hover {
     <footer id="ds-footer">
         <p>&copy; 2026 DishScope. All rights reserved.</p>
     </footer>
+
 </html>
