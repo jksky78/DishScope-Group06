@@ -269,3 +269,102 @@ header {
     transform: translateY(-3px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
+
+/* ================================================================
+   DishScope - dishpage.css
+   ================================================================ */
+
+/* ---- Typefaces ---- */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---- Design tokens ---- */
+:root {
+    --bg:           #f5f7ff;
+    --bg-2:         #eef1fa;
+    --surface:      #ffffff;
+    --surface-2:    #f8f9fc;
+
+    --indigo:       #5b5ce2;
+    --indigo-d:     #4345c8;
+    --indigo-50:    #eeeefc;
+    --indigo-100:   #ddddfb;
+    --indigo-200:   #c4c4f7;
+    --indigo-400:   #8f90ec;
+
+    --text:         #0c0d1a;
+    --text-2:       #1e2035;
+    --text-muted:   #6b7090;
+    --text-light:   #9fa3c0;
+
+    --border:       #e3e5f0;
+    --border-2:     #cdd0e4;
+    --shadow-xs:    0 1px 3px rgba(12,13,26,0.06);
+    --shadow-sm:    0 2px 8px rgba(12,13,26,0.07), 0 1px 3px rgba(12,13,26,0.05);
+    --shadow-md:    0 6px 20px rgba(12,13,26,0.08), 0 2px 6px rgba(12,13,26,0.04);
+    --shadow-lg:    0 16px 48px rgba(12,13,26,0.10), 0 4px 14px rgba(12,13,26,0.05);
+    --shadow-btn:   0 6px 20px rgba(91,92,226,0.30);
+
+    --danger:       #e53e3e;
+    --success:      #0d9f6e;
+    --amber:        #e8a020;
+    --white:        #ffffff;
+
+    --header-h:     64px;
+    --radius-sm:    10px;
+    --radius-md:    14px;
+    --radius-lg:    20px;
+    --radius-xl:    26px;
+    --radius-pill:  999px;
+}
+/* ================================================================
+   FOOTER
+   ================================================================ */
+#ds-footer {
+    width: 100%;
+    padding: 20px 32px;
+    text-align: center;
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: var(--text-light);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+    letter-spacing: 0.01em;
+}
+/* ---- Reset ---- */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+input,
+select,
+textarea,
+button {
+    font-family: inherit;
+}
+
+/* ---- Body ---- */
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(ellipse 90% 45% at 50% 0%, rgba(91,92,226,0.09) 0%, transparent 65%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;                    
+    padding-top: var(--header-h);     
+}
+
+/* ---- Header ---- */
+header {
+    background-color: #ffffff;               
+    background-color: var(--surface, #ffffff);
+    color: var(--text, #0c0d1a);
+    width: 100%;
+    position: fixed;
+    top: 0;
+}
