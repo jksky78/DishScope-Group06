@@ -1,166 +1,351 @@
-* {
+/* ================================================================
+   DishScope - dishpage.css
+   ================================================================ */
+
+/* ---- Typefaces ---- */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---- Design tokens ---- */
+:root {
+    --bg:           #f5f7ff;
+    --bg-2:         #eef1fa;
+    --surface:      #ffffff;
+    --surface-2:    #f8f9fc;
+
+    --indigo:       #5b5ce2;
+    --indigo-d:     #4345c8;
+    --indigo-50:    #eeeefc;
+    --indigo-100:   #ddddfb;
+    --indigo-200:   #c4c4f7;
+    --indigo-400:   #8f90ec;
+
+    --text:         #0c0d1a;
+    --text-2:       #1e2035;
+    --text-muted:   #6b7090;
+    --text-light:   #9fa3c0;
+
+    --border:       #e3e5f0;
+    --border-2:     #cdd0e4;
+    --shadow-xs:    0 1px 3px rgba(12,13,26,0.06);
+    --shadow-sm:    0 2px 8px rgba(12,13,26,0.07), 0 1px 3px rgba(12,13,26,0.05);
+    --shadow-md:    0 6px 20px rgba(12,13,26,0.08), 0 2px 6px rgba(12,13,26,0.04);
+    --shadow-lg:    0 16px 48px rgba(12,13,26,0.10), 0 4px 14px rgba(12,13,26,0.05);
+    --shadow-btn:   0 6px 20px rgba(91,92,226,0.30);
+
+    --danger:       #e53e3e;
+    --success:      #0d9f6e;
+    --amber:        #e8a020;
+    --white:        #ffffff;
+
+    --header-h:     64px;
+    --radius-sm:    10px;
+    --radius-md:    14px;
+    --radius-lg:    20px;
+    --radius-xl:    26px;
+    --radius-pill:  999px;
+}
+/* ================================================================
+   FOOTER
+   ================================================================ */
+#ds-footer {
+    width: 100%;
+    padding: 20px 32px;
+    text-align: center;
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: var(--text-light);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+    letter-spacing: 0.01em;
+}
+/* ---- Reset ---- */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
+
+input,
+select,
+textarea,
+button {
+    font-family: inherit;
+}
+
+/* ---- Body ---- */
 body {
-    margin: 0;
-    padding: 30px;
-    font-family: Arial, sans-serif;
-    background-color: white;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(ellipse 90% 45% at 50% 0%, rgba(91,92,226,0.09) 0%, transparent 65%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;                   
+    padding-top: var(--header-h);    
 }
 
-h1 {
-    font-size: 40px;
-    font-weight: normal;
-    margin: 0 0 20px 5px;
-}
-
+/* ---- Header ---- */
 header {
-    background-color: #0b131e;
-    color: #ffffff;
+    background-color: #ffffff;             
+    background-color: var(--surface, #ffffff);
+    color: var(--text, #0c0d1a);
     width: 100%;
     position: fixed;
     top: 0;
     left: 0;
-    padding: 10px 30px;
+    height: var(--header-h);
+    padding: 0 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 1000;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-xs);
 }
+
+/* Brand wordmark */
+header h1 {
+    margin: 0;                        
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    background: linear-gradient(125deg, var(--indigo) 0%, var(--indigo-400) 55%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #0b131e; /* Matches your dark theme */
+    background-color: transparent;
     padding: 15px 30px;
     color: #ffffff;
 }
+
+/* ---- Nav / dropdown ---- */
 .nav-menu {
     position: relative;
 }
 
-/* Dropdown Button */
+.dropdown {
+    position: relative;
+}
+
+
+.dropdown::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 100%;
+    height: 12px;
+    pointer-events: auto;
+}
+
 .dropbtn {
-    background-color: transparent;
-    color: white;
-    padding: 8px 16px;
-    font-size: 1rem;
-    border: 1px solid #2a3b4c;
-    border-radius: 4px;
+    background: var(--indigo-50);
+    color: var(--indigo);
+    padding: 8px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border: 1px solid var(--indigo-100);
+    border-radius: var(--radius-pill);
     cursor: pointer;
-    transition: background 0.3s;
+    letter-spacing: 0.005em;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
-.dropbtn:hover {
-    background-color: #1a2634;
+.dropbtn:hover,
+.dropbtn:focus-visible {
+    background: var(--indigo-100);
+    border-color: var(--indigo-200);
+    outline: none;
 }
 
-/* Dropdown Content (Hidden by Default) */
+.dropbtn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(91,92,226,0.22);
+}
+
 .dropdown-content {
     display: none;
     position: absolute;
-    right: 0; /* Aligns dropdown to the right edge */
-    background-color: #1a2634;
-    min-width: 140px;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.3);
-    z-index: 1000;
-    border-radius: 4px;
+    right: 0;
+    top: calc(100% + 8px);
+    background: var(--surface);
+    min-width: 196px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    border: 1px solid #2a3b4c;
+    box-shadow: var(--shadow-lg);
+    z-index: 1001;
+    padding: 6px;
 }
 
-/* Links inside the dropdown */
 .dropdown-content a {
-    color: white;
-    padding: 10px 16px;
-    text-decoration: none;
     display: block;
-    font-size: 0.95rem;
+    padding: 9px 14px;
+    color: var(--text-2);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: background 0.12s, color 0.12s;
 }
 
-/* Change color of dropdown links on hover */
-.dropdown-content a:hover {
-    background-color: #2a3b4c;
+.dropdown-content a:hover,
+.dropdown-content a:focus-visible {
+    background: var(--indigo-50);
+    color: var(--indigo);
+    outline: none;
 }
 
-/* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
     display: block;
 }
 
 /* Logo styling */
 .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
     color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
-/* Main page border */
+/* ================================================================
+   DISH PAGE CONTENT
+   ================================================================ */
+
+
 .page {
     width: 100%;
-    min-height: 620px;
-    border: 4px solid black;
-    padding: 10px 40px 30px 40px;
+    max-width: 1280px;
+    padding: 24px 40px 48px;
+    border: none;
+    background: transparent;
 }
 
+/* Page headings ("Dish View", "Welcome back, ...") */
+h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 2.1rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--text-2);
+    margin: 0 0 12px 0;
+}
 
 /* Top section */
 .top-section {
     position: relative;
     min-height: 105px;
+    margin-bottom: 28px;
+    padding-right: 90px;         
 }
 
+.subtitle {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    line-height: 1.5;
+}
+
+p.secondary-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+}
 
 /* Search bar */
 .search-bar {
-    width: 60%;
-    height: 52px;
-    border: 2px solid #4f78c9;
-    padding: 10px;
-    font-size: 22px;
+    width: 100%;
+    max-width: 720px;
+    height: 56px;
+    padding: 0 24px;
+    font-size: 1rem;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-sm);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+.search-bar::placeholder {
+    color: var(--text-light);
+}
+
+.search-bar:focus {
+    border-color: var(--indigo-200);
+    box-shadow: 0 0 0 3px rgba(91,92,226,0.18), var(--shadow-sm);
+}
 
 /* Filter and sort */
 .controls {
-    margin-top: 7px;
+    margin-top: 14px;
     display: flex;
-    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+}
+
+.controls label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-2);
 }
 
 .controls select {
-    width: 172px;
-    height: 46px;
-    font-size: 20px;
-    padding: 5px;
-    border: 2px solid #333;
-    background-color: white;
+    min-width: 160px;
+    height: 48px;
+    padding: 0 18px;
+    font-size: 0.95rem;
+    color: var(--text-2);
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+.controls select:focus {
+    border-color: var(--indigo-200);
+    box-shadow: 0 0 0 3px rgba(91,92,226,0.18), var(--shadow-sm);
+}
 
 /* Profile icon */
 .avatar {
-    width: 80px;
-    height: 80px;
-    background-color: #4A90E2;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    font-size: 24px;
-    font-weight: bold;
-    display: flex;
     position: absolute;
     right: 15px;
     top: 10px;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%; /* Makes it a perfect circle */
-    right: 15px;
-    top: 10px;
+    width: 60px;
+    height: 60px;
+    display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--indigo) 0%, #8b5cf6 100%);
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-btn);
 }
-
 
 /* Head */
 .head {
@@ -175,59 +360,55 @@ header {
     left: 25px;
 }
 
-
-/* Body */
-.body {
-    position: absolute;
-    width: 50px;
-    height: 30px;
-
-    background-color: #aaa;
-    border-radius: 30px 30px 0 0;
-
-    bottom: 10px;
-    left: 15px;
-}
-
-
 /* Dish grid */
 .dish-container {
     display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 12px 38px;
-
-    margin-top: 5px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 8px;
 }
 
+/* Availability text colors */
+.status-available {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.status-unavailable {
+    color: var(--danger);
+    font-weight: 600;
+}
 
 /* Dish card */
 .dish-card {
-    height: 212px;
     height: auto;
-    border: 2px solid #4f78c9;
-
-    padding: 10px;
-
-    font-size: 18px;
+    padding: 0 0 16px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    transition: box-shadow 0.2s, transform 0.2s;
 }
 
+.dish-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
 
 /* Picture placeholder */
 .dish-picture {
     width: 100%;
-    height: 280px;
-
-    background-color: #eeeeee;
-
+    height: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    margin-bottom: 5px;
+    margin-bottom: 16px;
     overflow: hidden;
-    color: #777;
+    background-color: var(--bg-2);
+    color: var(--text-light);
 }
 
 /* Image inside picture container */
@@ -239,12 +420,34 @@ header {
 
 /* Dish name */
 .dish-card h2 {
-    font-size: 21px;
-    margin: 3px 0 8px 0;
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--text);
+    margin: 0 0 8px 0;
+    padding: 0 24px;
 }
 
-
-/* Information */
+/* Information: bold label, muted value */
 .dish-card p {
-    margin: 4px 0;
+    margin: 0;
+    padding: 6px 24px;
+    color: var(--text-muted);
+}
+
+.dish-card p strong,
+.dish-card p b {
+    color: var(--text);
+    font-weight: 700;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+    header {
+        padding: 0 20px;
+    }
+
+    header h1 {
+        font-size: 1.3rem;
+    }
 }

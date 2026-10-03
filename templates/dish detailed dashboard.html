@@ -11,14 +11,14 @@
     <title>{{ dish['name'] }}</title>
 
     <link rel="stylesheet"
-          href="../static/css/dish_detail.css">
+          href="{{ url_for('static', filename='css/dish_detail.css') }}">
     <header>
         <h1>DishScope</h1>
         <nav class="nav-menu">
         <div class="dropdown">
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
-                <a href="{{ url_for('dish_view') }}">Dish View</a>
+                <a href="{{ url_for('dish_view') }}">View Dish</a>
                 {% if session.get('role') == 'vendor' %}
                     <a href="{{ url_for('add_dish') }}">Add Dish</a>
                     <a href="{{ url_for('menu_management') }}">Menu Management</a>
@@ -36,7 +36,7 @@
 
         <!-- BACK BUTTON -->
 
-        <a href="{{ url_for('home') }}" class="back-button">
+        <a href="{{ url_for('dish_view') }}" class="back-button">
             ← Back to dishes
         </a>
 
@@ -91,7 +91,10 @@
                 <b>Availability:</b>
                 {{ dish['availability'] }}
             </p>
-
+            <p>
+                <b>Ingredients:</b>
+                {{ dish['ingredients'] }}
+            </p>
         </div>
 
 
@@ -213,22 +216,6 @@
          ============================================================ -->
     <div class="reviews-section">
         <h2>Reviews for <span id="reviewsDishName">this dish</span></h2>
-
-        <div class="controls-panel">
-            <div class="control-group">
-                <label>Filter:</label>
-                <div class="filter-placeholder">
-                    <input type="text" placeholder="Filter component..." disabled>
-                </div>
-            </div>
-            <div class="control-group">
-                <label>Sort by:</label>
-                <div class="filter-placeholder">
-                    <select disabled>
-                        <option>Sort component...</option>
-                    </select>
-                </div>
-            </div>
         </div>
 
         <div class="reviews-grid" id="reviewsList">
@@ -240,7 +227,7 @@
                 <span class="review-date"><b>Date posted:</b>{{ review['date_posted'] if review['date_posted'] else 'Recent' }}</span>
             </div>
             <p><b>Rating:</b> {{ review['rating'] }}/5</p>
-            <p><b>Comment:</b> {{ review['comment'] }}</p>
+            <p style="word-break: break-word; overflow-wrap: break-word; margin: 0;"><b>Comment:</b> {{ review['comment'] }}</p>
         </div>
         {% else %}
             <p>No reviews for this dish yet. Be the first to leave one!</p>
@@ -252,9 +239,6 @@
         </div>
     </div>
 
-    <div class="back-link">
-        <a href="menu management.html">Go back Dish Viewing page</a>
-    </div>
 
 </div>
 
@@ -262,4 +246,7 @@
 </script>
 
 </body>
+    <footer id="ds-footer">
+        <p>&copy; 2026 DishScope. All rights reserved.</p>
+    </footer>
 </html>

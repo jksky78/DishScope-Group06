@@ -3,6 +3,7 @@
 <head>
     <title>Menu Management</title>
     <style>
+
 /* ================================================================
    DishScope - vendor menu management page
    Same selectors as before, restyled to match style2.css / dishpage.css.
@@ -56,6 +57,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
 }
 
 /* Form controls ignore the page font by default, so make them inherit it */
@@ -658,7 +660,7 @@ button.success:hover {
 }
        
        
-       
+
     </style>
         <header>
         <h1>DishScope</h1>
@@ -677,9 +679,11 @@ button.success:hover {
                     <a href="{{ url_for('profile') }}">Profile</a>
                     <a href="{{ url_for('logout') }}">Logout</a>
 
+
             </div>
         </div>
     </nav>
+
 
 
 
@@ -692,18 +696,22 @@ button.success:hover {
 
     <div class="header-actions">
         <div class="stats">
+
             <span>Total dishes: {{ total_dishes }}</span>
             <span>Available: <span id="available">{{ total_availability }}</span></span>
             <span>Unavailable: <span id="unavailable">{{ total_unavailability }}</span></span>
         </div>
-        <a href="dish-registration.html" class="btn-primary">+ Add New Dish</a>
+        <a href="{{ url_for('add_dish') }}" class="btn-primary">+ Add New Dish</a>
     </div>
     
+
+
     <!-- Card Grid -->
     <div class="menu-grid" id="menuGrid"></div>
 
     <!-- Edit Form Section -->
     <div id="editSection">
+
     <h2>Edit Dish (for vendor only)</h2>
         <input type="hidden" id="editId">
         <div class="edit-layout">
@@ -762,4 +770,5 @@ button.success:hover {
     <footer id="ds-footer">
         <p>&copy; 2026 DishScope. All rights reserved.</p>
     </footer>
+
 </html>
