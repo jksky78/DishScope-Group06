@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, url_for, session , flash, jsonify
 from itsdangerous import URLSafeSerializer
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -6,7 +7,6 @@ from werkzeug.utils import secure_filename
 import os
 import uuid
 import sqlite3
-
 
 app = Flask(__name__)
 app.secret_key = "DishScope-000"
@@ -21,10 +21,13 @@ def require_login():
     print("CURRENT ENDPOINT:", request.endpoint)
     # Route endpoints that anyone is allowed to visit without logging in
     public_endpoints = ['login', 'register', 'static', 'home', 'verify_email','reset_password' ] 
-
     # Routes that ONLY vendors are allowed to access
+<<<<<<< HEAD
     vendor_endpoints = ['add_dish', 'edit_dish', 'menu_management', 'report_summary']
 
+=======
+    vendor_endpoints = ['add_dish', 'edit_dish', 'menu_management', 'report summary']
+>>>>>>> a3a0b5bf50006b99d6da93cda7e80260ec26eb5b
     # If the current request endpoint requires login and user session is missing
     if request.endpoint and request.endpoint not in public_endpoints:
         if not session.get('logged_in'):
@@ -34,7 +37,6 @@ def require_login():
     if request.endpoint in vendor_endpoints and session.get('role') != 'vendor':
         flash_once('Access denied. You must be logged in as a vendor to access this page.', 'danger')
         return redirect(url_for('home'))
-
 @app.get("/")
 def home ():
     if request.method == 'GET':
@@ -55,10 +57,18 @@ def init_db():
                 role text not null
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS vendors (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            vendor_name TEXT NOT NULL,
+            vendor_location TEXT NOT NULL,
+            role TEXT NOT NULL
+        )
+    ''')
     
     conn.commit()
     conn.close()
-
 def init_dish_db():
     # connects to  database (and creates the file if it doesn't exist yet)
     conn = sqlite3.connect('dish_database.db')
@@ -86,11 +96,9 @@ def init_dish_db():
     
     conn.commit()
     conn.close()
-
 def init_dish_review():
     conn = sqlite3.connect("dish_database.db")
     cursor = conn.cursor()
-
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS reviews (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,11 +112,9 @@ def init_dish_review():
 """)
     conn.commit()
     conn.close()
-
 init_db()
 init_dish_db()
 init_dish_review()
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     name = ""
@@ -143,14 +149,12 @@ def register():
             connection.close()
             flash_once("Username already taken.", "error")
             return redirect(url_for('register'))
-
         # Check existing email
         cursor.execute("SELECT * FROM users WHERE email = ?", (table_email,))
         if cursor.fetchone():
             connection.close()
             flash_once("Email already registered.", "error")
             return redirect(url_for('register'))
-
         # Check Vendor name
         cursor.execute("SELECT * FROM vendors WHERE vendor_name = ?", (table_vendor_name,))
         if cursor.fetchone():
@@ -170,7 +174,6 @@ def register():
         else:
             cursor.execute(table)
             cursor.execute(input_insert, (table_username, hashed_password, email, role))
-
             new_user_id = cursor.lastrowid
             connection.commit()
             if role == "vendor":
@@ -195,17 +198,14 @@ def register():
             connection.close()
             conn = sqlite3.connect('dish_database.db')
             cursor = conn.cursor()
-
             # Fetch all dishes from the table
             cursor.execute("SELECT * FROM dishes")
             dishes = cursor.fetchall()  # Grab all rows
-
             # Close the connection
             conn.close()
             flash_once("Registration successful! Please log in.", "success")
             return redirect(url_for('home'))
     
-
 
     return render_template('register.html')
     
@@ -226,12 +226,10 @@ def login():
         
         
         if result and check_password_hash(result[2], table_password):
-
             print("Login successful!")   
             session["logged_in"] = True
             session["user"] = result[1]
             session['user_id'] = result[0] 
-
             if result[3] == "student":    
                 session['role'] = 'student'
             else:
@@ -241,84 +239,63 @@ def login():
         else:
             print("Invalid username or password!")
             return render_template('login.html', error="Invalid username or password!")
-
         
     return render_template("login.html")
-
 @app.route('/logout', methods=["GET", "POST"])
 def logout():
     session.clear()
     return redirect(url_for('home'))
-
 
 @app.route("/verify-email", methods=["GET", "POST"])
 def verify_email():
     if request.method == "POST":
         connection = sqlite3.connect('test.db')
         cursor = connection.cursor()
-
         table_email = request.form.get("email")
         sql = "SELECT * FROM users WHERE email = ?"
         cursor.execute(sql, (table_email,))
         result = cursor.fetchone()
         print("Entered username:", table_email)
-
         
         if result:
             print("Resetting")
             session["reset_email"] = table_email
             return render_template("change-pass.html")
-
         else:
             flash_once('Email not found in our system. Please check and try again.', 'danger')
             return redirect(url_for('verify_email'))
-
         connection.close()
-
     return render_template("email-check.html")
-
 @app.route("/reset-password", methods=["GET", "POST"])
 def reset_password():
-
     if request.method == "POST":
-
         new_password = request.form.get("new_password", "").strip()
         confirm_password = request.form.get("confirm_password", "").strip()
         # Check that passwords match
         if new_password != confirm_password:
             return "Passwords do not match"
-
         # Get the email from the previous verification step
         email = session.get("reset_email")
         print("New password:", new_password)
         print("Email:", email)
         if not email:
             return "Email verification required"
-
         connection = sqlite3.connect("test.db")
         cursor = connection.cursor()
-
         # Update the password belonging to that email
         cursor.execute(
             "UPDATE users SET password = ? WHERE email = ?",
             (new_password, email)
         )
-
         connection.commit()
-
         connection.close()
-
         # Remove the email after the password has been changed
         session.pop("reset_email", None)
-
         return redirect("/login")
-
     return render_template("change-pass.html")
-
 @app.route("/add_dish", methods=["GET", "POST"])
 def add_dish():
     return render_template("dish-registration.html")
-
 @app.route("/upload-image", methods=["POST"])
 def upload():
     file = request.files['file']
@@ -330,7 +307,6 @@ def upload():
         }), 200
         
     
-
 @app.route("/create_dish", methods=["GET", "POST"])
 def create_dish():
   if request.method == "POST":
@@ -377,7 +353,6 @@ def create_dish():
     allergens = request.form.get("allergens")
     availability = request.form.get("availability")
 
-
     # Handle image filename if uploaded
     image_filename = ""
     if "image" in request.files:
@@ -393,29 +368,24 @@ def create_dish():
       sqlite3.Row
   ) 
     cursor = conn.cursor()
-
   # Fetch all dishes from the table
     cursor.execute("SELECT * FROM dishes")
     dishes = cursor.fetchall()  # Grab all rows
-
   # Close the connection
     conn.close()
     return render_template("dishpage.html", dishes=dishes, user=user)
   
-
   
 def get_dish_from_db():
   # Connect to SQLite database
   conn = sqlite3.connect("dish_database.db")
   conn.row_factory = sqlite3.Row
   cursor = conn.cursor()
-
   # Fetch the first dish
   cursor.execute("SELECT * FROM dishes WHERE id = 1")
   dish = cursor.fetchone()
   conn.close()
   return dish
-
 
 @app.route("/dish_view", methods=["GET", "POST"])
 def dish_view():
@@ -458,12 +428,10 @@ def dish_view():
         return redirect(url_for('home', error="You do not have access to this page, please log in"))
         
 
-
 @app.errorhandler(413)
 def too_large(e):
     # Flash a friendly message (requires a secret_key set on your app)
     return render_template('dish-registration.html', error="The uploaded image is too large! Please choose an image under 5MB."), 413
-
 
 
 @app.route("/menu management", methods=["GET", "POST"])
@@ -478,7 +446,6 @@ def menu_management():
         conn = sqlite3.connect("dish_database.db")
         conn.row_factory = (sqlite3.Row) 
         cursor = conn.cursor()
-
         dishes = cursor.execute("SELECT * FROM dishes WHERE vendor_id = ?", (user_id,)).fetchall()
         total_dishes = cursor.execute("SELECT COUNT(*) FROM dishes WHERE vendor_id = ?", (user_id,)).fetchone()[0]
         total_availability = cursor.execute("SELECT COUNT(*) FROM dishes WHERE vendor_id = ? AND availability = 'Yes' COLLATE NOCASE", (user_id,)).fetchone()[0]
@@ -526,12 +493,6 @@ def dish_detail(dish_id):
         return render_template("dish detailed dashboard.html", dish=dish, vendor=vendor, reviews=reviews, total_reviews=total_reviews, avg_rating=avg_rating)
 
 
-
-
-@app.route("/dishpage", methods=["GET", "POST"])
-def dishpage():
-        return render_template("dishpage.html")
-
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     conn = sqlite3.connect("test.db")
@@ -568,7 +529,6 @@ def profile():
     else:
         vendor = None
     return render_template('profile.html', user=user, vendor=vendor)
-
 @app.route("/dish/<int:dish_id>/review", methods=["GET", "POST"])
 def add_review(dish_id):
     print("ALL FORM DATA:", request.form)
@@ -606,7 +566,6 @@ def add_review(dish_id):
     
     flash_once("Review added successfully!", "success")
     return redirect(url_for('dish_detail', dish_id=dish_id))
-
 @app.route('/delete_dish/<int:dish_id>', methods=['POST'])
 def delete_dish(dish_id):
     # Check the specific vendor with id
@@ -620,20 +579,16 @@ def delete_dish(dish_id):
         return redirect(url_for('login'))
         
     user_id = session.get('user_id')
-
     # Connect to the dish database
     conn = sqlite3.connect("dish_database.db")
     cursor = conn.cursor()
-
      # Delete the selected dish created by the specific vendor
     cursor.execute("DELETE FROM dishes WHERE id = ? AND vendor_id = ?", (dish_id, user_id))
     
     conn.commit()
     conn.close()
-
     # Redirect back to the menu management page
     return redirect(url_for('menu_management')) 
-
 @app.route('/dish/<int:dish_id>/edit', methods=['GET', 'POST'])
 def edit_dish(dish_id):
     conn = sqlite3.connect("test.db")
@@ -641,11 +596,9 @@ def edit_dish(dish_id):
     cursor = conn.cursor()
     user_id = session.get('user_id')
     conn.close()
-
     conn = sqlite3.connect("dish_database.db")
     conn.row_factory = (sqlite3.Row)
     cursor = conn.cursor()
-
     if request.method == 'POST':
             # 1. Grab all text/dropdown inputs from the form
             name = request.form.get('name')
@@ -689,11 +642,9 @@ def edit_dish(dish_id):
     
             flash_once("Dish updated successfully!", "success")
             return redirect(url_for('edit_dish', dish_id=dish_id))
-
     dish = cursor.execute("SELECT * FROM dishes WHERE id = ? AND vendor_id = ?", (dish_id, user_id)).fetchone()
     conn.close()
     return render_template("edit_dish.html", dish=dish)
-
 @app.route('/report_summary', methods=['POST', 'GET'])
 def report_summary():
     conn = sqlite3.connect("test.db")
@@ -708,7 +659,6 @@ def report_summary():
     cursor = conn.cursor()
     
     total_dishes = cursor.execute("SELECT COUNT(*) FROM dishes WHERE vendor_id = ?", (user_id,)).fetchone()[0]
-
     # Total review on the dish
     total_reviews = cursor.execute("""
         SELECT COUNT(reviews.id) AS total_reviews 
@@ -716,7 +666,6 @@ def report_summary():
         JOIN dishes ON reviews.dish_id = dishes.id 
         WHERE dishes.vendor_id = ?
     """, (user_id,)).fetchone()['total_reviews']
-
     # Highest rated dish
     highest_rated = cursor.execute("""
         SELECT dishes.name, dishes.image_filename, AVG(reviews.rating) AS avg_rating 
@@ -727,7 +676,6 @@ def report_summary():
         ORDER BY avg_rating DESC 
         LIMIT 1
     """, (user_id,)).fetchone()
-
     most_reviewed = cursor.execute("""
         SELECT dishes.name, dishes.image_filename, COUNT(reviews.id) AS review_count 
         FROM dishes 
@@ -738,10 +686,10 @@ def report_summary():
         LIMIT 1
     """, (user_id,)).fetchone()
 
-
     return render_template("report summary.html", vendor=vendor, total_dishes=total_dishes,
                             total_reviews=total_reviews, highest_rated=highest_rated, most_reviewed=most_reviewed)
 
+<<<<<<< HEAD
 
 
 
@@ -751,5 +699,7 @@ def review_rating():
 
 
 
+=======
+>>>>>>> a3a0b5bf50006b99d6da93cda7e80260ec26eb5b
 if __name__ == "__main__":
     app.run(debug=True)
