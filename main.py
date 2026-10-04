@@ -808,7 +808,7 @@ def edit_dish(dish_id):
             ingredients = request.form.get('ingredients')
             allergens = request.form.get('allergens')
             is_available = request.form.get('availability')
-    
+            description = request.form.get('description')
             # 2. Check if a new image file was uploaded
             file = request.files['file']
             if file and file.filename != '':
@@ -823,18 +823,18 @@ def edit_dish(dish_id):
                     UPDATE dishes 
                     SET name = ?, category = ?, price = ?, spicy_level = ?, 
                         allergens = ?, availability = ?, image_filename = ?, calories = ?,
-                        ingredients = ?
+                        ingredients = ?, description = ?
                     WHERE id = ? AND vendor_id = ?
-                ''', (name, category, price, spicy_level, allergens, is_available, unique_filename, calories, ingredients, dish_id, user_id))
+                ''', (name, category, price, spicy_level, allergens, is_available, unique_filename, calories, ingredients, description, dish_id, user_id))
                 dish = cursor.execute("SELECT * FROM dishes where id = ? AND vendor_id = ?", (dish_id, user_id)).fetchone()
             else:
                 # 4. UPDATE WITHOUT touching the image column (keeps the existing image safe if no new one was chosen)
                 cursor.execute('''
                     UPDATE dishes 
                     SET name = ?, category = ?, price = ?, spicy_level = ?, 
-                        allergens = ?, availability = ?, calories = ?, ingredients = ?
+                        allergens = ?, availability = ?, calories = ?, ingredients = ?, description = ?
                     WHERE id = ? AND vendor_id = ?
-                ''', (name, category, price, spicy_level, allergens, is_available, calories, ingredients, dish_id, user_id))
+                ''', (name, category, price, spicy_level, allergens, is_available, calories, ingredients, description, dish_id, user_id))
                 dish = cursor.execute("SELECT * FROM dishes where id = ? AND vendor_id = ?", (dish_id, user_id)).fetchone()
             conn.commit()
             conn.close()
