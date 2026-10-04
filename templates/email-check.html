@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Email Verification</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
     <header>
         <h1>DishScope</h1>
@@ -32,9 +32,9 @@
     {% endwith %}
     <form method="POST" action="/verify-email">
         <div class="user-verification-container">
-            <h2>Reset Password</h2>
+            <h2>Email verification</h2>
             <div class="input-group-email">
-                <label for="email">Email</label>
+                <label for="email">Enter your Email:</label>
                 <input type="email" id="email" name="email" required placeholder="Enter your email">
             </div>
             
