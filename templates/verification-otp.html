@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
+    <header>
+        <h1>DishScope</h1>
+        <nav class="nav-menu">
+        <div class="dropdown">
+            <button class="dropbtn">Menu ▼</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('home') }}">Home</a>
+            </div>
+        </div>
+    </nav>
+    </header>
+</head>
+<body>
+    <!-- Flash Messages Container -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" style="color: red; margin-bottom: 15px; font-weight: 500;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <form method="POST" action="{{ form_action }}">
+        <div class="user-verification-container">
+            <h2>Email verification</h2>
+            <p>Please check your email for the 6-digit code.</p>
+            <form method="POST">
+                <input type="text" name="otp" maxlength="6" class="otp-input" pattern="\d{6}" inputmode="numeric" required autofocus>
+            </form>
+            
+            <button type="submit" class="submit-btn">Confirm</button>
+    </div>
+
+    </form>
+</body>
+    <footer id="ds-footer">
+        <p>&copy; 2026 DishScope. All rights reserved.</p>
+    </footer>
+</html>
