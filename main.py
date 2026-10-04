@@ -4,23 +4,50 @@ from itsdangerous import URLSafeSerializer
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
-import os
+from email.message import EmailMessage
+import os, hmac, hashlib, secrets, smtplib, sqlite3, random, time
 import uuid
 from datetime import datetime, timezone, timedelta
 import sqlite3
+
+def load_env():
+    try:
+        with open(".env", "r") as file:
+            for line in file:
+                line = line.strip()
+
+                if not line or line.startswith("#"):
+                    continue
+
+                key, value = line.split("=", 1)
+                os.environ[key.strip()] = value.strip()
+
+    except FileNotFoundError:
+        print(".env file not found")
+
+load_env()
+print("SMTP email loaded:", os.environ.get("SMTP_EMAIL"))
+print("SMTP password loaded:", bool(os.environ.get("SMTP_APP_PASSWORD")))
 app = Flask(__name__)
 app.secret_key = "DishScope-000"
+OTP_VALID_MINUTES = 10
+OTP_MAX_ATTEMPTS = 5
+TIME_FMT = "%Y-%m-%d %H:%M:%S"
 UPLOAD_FOLDER = 'static/img'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
+
+
 def flash_once(message, category="message"):
     session.pop('_flashes', None)
     flash(message, category)
+
 @app.before_request
 def require_login():
     print("CURRENT ENDPOINT:", request.endpoint)
     # Route endpoints that anyone is allowed to visit without logging in
-    public_endpoints = ['login', 'register', 'static', 'home', 'verify_email','reset_password' ] 
+    public_endpoints = ['login', 'register', 'static', 'home', 'verify_email','reset_password', 'verify_otp',
+                        'verify_reset_otp' ] 
     # Routes that ONLY vendors are allowed to access
     vendor_endpoints = ['add_dish', 'edit_dish', 'menu_management', 'report summary']
     # If the current request endpoint requires login and user session is missing
@@ -59,6 +86,29 @@ def init_db():
             vendor_name TEXT NOT NULL,
             vendor_location TEXT NOT NULL,
             role TEXT NOT NULL
+        )
+    ''')
+    
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS pending_registrations (
+            email         TEXT PRIMARY KEY,
+            name          TEXT NOT NULL,
+            password_hash TEXT NOT NULL,
+            role          TEXT,
+            vendor_name   TEXT,
+            vendor_location   TEXT,
+            otp_hash      TEXT NOT NULL,
+            expires_at    TEXT NOT NULL,
+            attempts      INTEGER DEFAULT 0,
+            last_sent     TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS password_resets (
+            email      TEXT PRIMARY KEY,
+            otp_hash   TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            attempts   INTEGER DEFAULT 0
         )
     ''')
     
@@ -110,98 +160,73 @@ def init_dish_review():
 init_db()
 init_dish_db()
 init_dish_review()
+
+def generate_otp():
+    return f"{secrets.randbelow(10**6):06d}" 
+
+def hash_otp(otp):
+    return hmac.new(app.secret_key.encode(), otp.encode(), hashlib.sha256).hexdigest()
+
+def send_otp_email(to_email, otp):
+    msg = EmailMessage()
+    msg["Subject"] = "Your DishScope verification code"
+    msg["From"] = os.environ["SMTP_EMAIL"]
+    msg["To"] = to_email
+    msg.set_content(
+        f"Your DishScope verification code is: {otp}\n\n"
+        f"It expires in {OTP_VALID_MINUTES} minutes. "
+        f"If you didn't request this, you can ignore this email."
+    )
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(os.environ["SMTP_EMAIL"], os.environ["SMTP_APP_PASSWORD"])
+        smtp.send_message(msg) 
+
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    name = ""
-    errors = []
     if request.method == "POST":
-        print(">>> SUCCESS: The register POST route was hit! <<<")
-        role = request.form.get("role")
-        connection = sqlite3.connect('test.db')
-        cursor = connection.cursor()
-        table2 = 'drop table users'
-        table = '''create table if not exists users(
-                ID integer primary key autoincrement,
-                name text not null,
-                password text not null,
-                email text not null,
-                role text not null
-        )'''
-        input_insert = "insert into users(name, password, email, role) values(?, ?, ?, ?)"
-        name = request.form['name']
-        password = request.form['password']
-        hashed_password = generate_password_hash(password)
-        email = request.form['email']
-        table_username = request.form.get("name", "").strip()
-        table_password = (request.form.get("password",) or "").strip()
-        table_email = request.form.get("email")
-        table_vendor_name = request.form.get("vendor_name")
-        table_vendor_location = request.form.get("vendor_location")
-        
-         # Check existing name
-        cursor.execute("SELECT * FROM users WHERE name = ?", (table_username,))
-        if cursor.fetchone():
-            connection.close()
-            flash_once("Username already taken.", "error")
-            return redirect(url_for('register'))
-        # Check existing email
-        cursor.execute("SELECT * FROM users WHERE email = ?", (table_email,))
-        if cursor.fetchone():
-            connection.close()
-            flash_once("Email already registered.", "error")
-            return redirect(url_for('register'))
-        # Check Vendor name
-        cursor.execute("SELECT * FROM vendors WHERE vendor_name = ?", (table_vendor_name,))
-        if cursor.fetchone():
-            connection.close()
-            flash_once("Vendor name already chosen.", "error")
-            return redirect(url_for('register'))
-        
-        if not table_username:
-            error_name = "Username is required"
-            return render_template("register.html", error_name=error_name)
-        elif not table_password:
-            error_pass = "Password is required"
-            return render_template("register.html", table_username=table_username, error_pass=error_pass)
-        elif not table_email:
-            error_email = "Email is required"
-            return render_template("register.html", table_username=table_username, table_password=table_password, error_email=error_email)
-        else:
-            cursor.execute(table)
-            cursor.execute(input_insert, (table_username, hashed_password, email, role))
-            new_user_id = cursor.lastrowid
-            connection.commit()
-            if role == "vendor":
-                if table_vendor_name.isdigit() or not table_vendor_name:
-                    error_vendor = "Vendor name cannot be only numbers."
-                    return render_template("register.html", error_vendor=error_vendor)
-        
-                if table_vendor_location.isdigit() or not table_vendor_location:
-                    error_vendor = "Vendor location cannot be only numbers."
-                    return render_template("register.html", error_vendor=error_vendor)
-                vendor_table = '''create table if not exists vendors(
-                ID integer primary key,
-                name text not null,
-                vendor_name text not null,
-                vendor_location text not null,
-                role text not null
-        )'''
-                input_insert_vendor = "insert into vendors(ID, name, vendor_name, vendor_location, role) values(?, ?, ?, ?, ?)"
-                cursor.execute(vendor_table)
-                cursor.execute(input_insert_vendor, (new_user_id, table_username, table_vendor_name, table_vendor_location, role))
-            connection.commit()
-            connection.close()
-            conn = sqlite3.connect('dish_database.db')
-            cursor = conn.cursor()
-            # Fetch all dishes from the table
-            cursor.execute("SELECT * FROM dishes")
-            dishes = cursor.fetchall()  # Grab all rows
-            # Close the connection
+        name = request.form["name"].strip()
+        email = request.form["email"].strip().lower()
+        role = request.form.get("role", "student")
+
+        conn = sqlite3.connect("test.db")
+        taken = conn.execute("SELECT 1 FROM users WHERE email = ?", (email,)).fetchone()
+        if taken:
             conn.close()
-            flash_once("Registration successful! Please log in.", "success")
-            return redirect(url_for('home'))
-    
-    return render_template('register.html')
+            flash_once("That email is already registered.", "danger")
+            return redirect(url_for("register"))
+
+        otp = generate_otp()
+        now = datetime.now()
+        conn.execute("""
+            INSERT OR REPLACE INTO pending_registrations
+            (email, name, password_hash, role, vendor_name, vendor_location,
+             otp_hash, expires_at, attempts, last_sent)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
+        """, (
+            email, name, generate_password_hash(request.form["password"]), role,
+            request.form.get("vendor_name", "").strip(),
+            request.form.get("vendor_location", "").strip(),
+            hash_otp(otp),
+            (now + timedelta(minutes=OTP_VALID_MINUTES)).strftime(TIME_FMT),
+            now.strftime(TIME_FMT),
+        ))
+        conn.commit()
+        conn.close()
+
+        try:
+            send_otp_email(email, otp)
+        except Exception as e:
+            print("Email failed:", e)
+            flash_once("Could not send the verification email.", "danger")
+            return redirect(url_for("register"))
+
+        session["pending_email"] = email          # <-- this is what verify_otp looks for
+        return redirect(url_for("verify_otp"))
+
+    return render_template("register.html")
+
     
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -239,52 +264,195 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('home'))
+
 @app.route("/verify-email", methods=["GET", "POST"])
 def verify_email():
     if request.method == "POST":
-        connection = sqlite3.connect('test.db')
-        cursor = connection.cursor()
-        table_email = request.form.get("email")
-        sql = "SELECT * FROM users WHERE email = ?"
-        cursor.execute(sql, (table_email,))
-        result = cursor.fetchone()
-        print("Entered username:", table_email)
-        
-        if result:
-            print("Resetting")
-            session["reset_email"] = table_email
-            return render_template("change-pass.html")
-        else:
-            flash_once('Email not found in our system. Please check and try again.', 'danger')
-            return redirect(url_for('verify_email'))
-        connection.close()
+        email = request.form.get("email", "").strip().lower()
+
+        conn = sqlite3.connect("test.db")
+        user = conn.execute("SELECT 1 FROM users WHERE email = ?", (email,)).fetchone()
+
+        if not user:
+            conn.close()
+            flash_once("Email not found in our system. Please check and try again.", "danger")
+            return redirect(url_for("verify_email"))
+
+        otp = generate_otp()
+        expires = (datetime.now() + timedelta(minutes=OTP_VALID_MINUTES)).strftime(TIME_FMT)
+        conn.execute(
+            "INSERT OR REPLACE INTO password_resets (email, otp_hash, expires_at, attempts) "
+            "VALUES (?, ?, ?, 0)",
+            (email, hash_otp(otp), expires),
+        )
+        conn.commit()
+        conn.close()
+
+        try:
+            send_otp_email(email, otp)
+        except Exception as e:
+            print("Email failed:", e)
+            flash_once("Could not send the email. Try again later.", "danger")
+            return redirect(url_for("verify_email"))
+
+        session["reset_email"] = email
+        session["reset_verified"] = False
+        return redirect(url_for("verify_reset_otp"))
+
     return render_template("email-check.html")
+
+@app.route("/verify_otp", methods=["GET", "POST"])
+def verify_otp():
+    email = session.get("pending_email")
+    if not email:
+        return redirect(url_for("register"))
+    # (delete the user_id = session.get('user_id') line)
+
+    if request.method == "POST":
+        entered = request.form.get("otp", "").strip()
+        conn = sqlite3.connect("test.db")
+        conn.row_factory = sqlite3.Row  
+        pending = conn.execute(
+            "SELECT * FROM pending_registrations WHERE email = ?", (email,)
+        ).fetchone()
+
+        if not pending:
+            conn.close()
+            flash_once("Session expired. Please register again.", "danger")
+            return redirect(url_for("register"))
+
+        if datetime.now() > datetime.strptime(pending["expires_at"], TIME_FMT):
+            conn.close()
+            flash_once("Code expired. Please verify your email again", "danger")
+            return redirect(url_for("verify_otp"))
+
+        if pending["attempts"] >= OTP_MAX_ATTEMPTS:
+            conn.execute("DELETE FROM pending_registrations WHERE email = ?", (email,))
+            conn.commit()
+            conn.close()
+            session.pop("pending_email", None)
+            flash_once("Too many wrong attempts. Please register again.", "danger")
+            return redirect(url_for("register"))
+
+        if not hmac.compare_digest(pending["otp_hash"], hash_otp(entered)):
+            conn.execute(
+                "UPDATE pending_registrations SET attempts = attempts + 1 WHERE email = ?",
+                (email,),
+            )
+            conn.commit()
+            conn.close()
+            flash_once("Incorrect code.", "danger")
+            return redirect(url_for("verify_otp"))
+
+        # Correct code: create the real account
+        try:
+            cur = conn.execute(
+                "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+                (pending["name"], email, pending["password_hash"], pending["role"]),
+            )
+            new_user_id = cur.lastrowid
+
+            if pending["role"] == "vendor":
+                # ...CREATE TABLE stays the same...
+                conn.execute(
+                    "INSERT INTO vendors (ID, name, vendor_name, vendor_location, role) "
+                    "VALUES (?, ?, ?, ?, ?)",
+                    (new_user_id, pending["name"], pending["vendor_name"],
+                     pending["vendor_location"], pending["role"]),
+                )
+        except sqlite3.IntegrityError:
+            pass
+        conn.execute("DELETE FROM pending_registrations WHERE email = ?", (email,))
+        conn.commit()
+        conn.close()
+
+        session.pop("pending_email", None)
+        flash_once("Email verified! You can now log in.", "success")
+        return redirect(url_for("login"))
+
+    return render_template("verification-otp.html", email=email,
+                           form_action=url_for("verify_otp"))
+
+@app.route("/verify_reset_otp", methods=["GET", "POST"])
+def verify_reset_otp():
+    email = session.get("reset_email")
+    if not email:
+        return redirect(url_for("verify_email"))
+
+    if request.method == "POST":
+        entered = request.form.get("otp", "").strip()
+
+        conn = sqlite3.connect("test.db")
+        conn.row_factory = sqlite3.Row
+        row = conn.execute(
+            "SELECT * FROM password_resets WHERE email = ?", (email,)
+        ).fetchone()
+
+        if not row or datetime.now() > datetime.strptime(row["expires_at"], TIME_FMT):
+            conn.close()
+            flash_once("Code expired. Please request a new one.", "danger")
+            return redirect(url_for("verify_email"))
+
+        if row["attempts"] >= OTP_MAX_ATTEMPTS:
+            conn.execute("DELETE FROM password_resets WHERE email = ?", (email,))
+            conn.commit()
+            conn.close()
+            session.pop("reset_email", None)
+            flash_once("Too many wrong attempts. Please start again.", "danger")
+            return redirect(url_for("verify_email"))
+
+        if not hmac.compare_digest(row["otp_hash"], hash_otp(entered)):
+            conn.execute(
+                "UPDATE password_resets SET attempts = attempts + 1 WHERE email = ?", (email,)
+            )
+            conn.commit()
+            conn.close()
+            flash_once("Incorrect code.", "danger")
+            return redirect(url_for("verify_reset_otp"))
+
+        # Correct code
+        conn.execute("DELETE FROM password_resets WHERE email = ?", (email,))
+        conn.commit()
+        conn.close()
+
+        session["reset_verified"] = True
+        return render_template("change-pass.html")
+
+    return render_template("verification-otp.html", email=email,
+                           form_action=url_for("verify_reset_otp"))
 @app.route("/reset-password", methods=["GET", "POST"])
 def reset_password():
+    if not session.get("reset_verified") or not session.get("reset_email"):
+        flash_once("Please verify your email first.", "danger")
+        return redirect(url_for("verify_email"))
     if request.method == "POST":
         new_password = request.form.get("new_password", "").strip()
         confirm_password = request.form.get("confirm_password", "").strip()
         # Check that passwords match
-        if new_password != confirm_password:
-            return "Passwords do not match"
+        if not new_password or new_password != confirm_password:
+            flash_once("Passwords do not match.", "danger")
+            return redirect(url_for("reset_password"))
         # Get the email from the previous verification step
         email = session.get("reset_email")
         print("New password:", new_password)
         print("Email:", email)
         if not email:
             return "Email verification required"
+        hashed_password = generate_password_hash(new_password)
         connection = sqlite3.connect("test.db")
         cursor = connection.cursor()
         # Update the password belonging to that email
         cursor.execute(
             "UPDATE users SET password = ? WHERE email = ?",
-            (new_password, email)
+            (hashed_password, email)
         )
         connection.commit()
         connection.close()
         # Remove the email after the password has been changed
         session.pop("reset_email", None)
-        return redirect("/login")
+        session.pop("reset_verified", None)
+        flash_once("Password updated. You can now log in.", "success")
+        return redirect(url_for("login"))
     return render_template("change-pass.html")
 @app.route("/add_dish", methods=["GET", "POST"])
 def add_dish():
@@ -719,5 +887,9 @@ def report_summary():
     """, (user_id,)).fetchone()
     return render_template("report summary.html", vendor=vendor, total_dishes=total_dishes,
                             total_reviews=total_reviews, highest_rated=highest_rated, most_reviewed=most_reviewed)
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)

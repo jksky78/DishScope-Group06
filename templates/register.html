@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Register</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
     <header>
         <h1>DishScope</h1>
@@ -12,6 +12,7 @@
             <button class="dropbtn">Menu ▼</button>
             <div class="dropdown-content">
                 <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('login') }}">Login</a>
             </div>
         </div>
     </nav>
@@ -19,7 +20,6 @@
 </head>
 <body>
     <form method="POST" action="/register">
-        <div class="form-box">
             <!-- Flash Messages Block -->
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -33,6 +33,7 @@
             {% if error_vendor %}
                 <p style="color: red; background: #ffe6e6; padding: 10px; margin-bottom: 15px; border-radius: 5px;">{{ error_vendor }}</p>
             {% endif %}
+        <div class="form-box">
             <h1>Sign up</h1>
             <p class="role">
                 Which role are you?
