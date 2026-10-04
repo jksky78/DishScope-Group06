@@ -26,8 +26,6 @@ def load_env():
         print(".env file not found")
 
 load_env()
-print("SMTP email loaded:", os.environ.get("SMTP_EMAIL"))
-print("SMTP password loaded:", bool(os.environ.get("SMTP_APP_PASSWORD")))
 app = Flask(__name__)
 app.secret_key = "DishScope-000"
 OTP_VALID_MINUTES = 10
