@@ -1,42 +1,26 @@
 """
-Creates demo accounts and sample data for DishScope so a tester can log in
+Creates demo accounts for DishScope so a tester can log in
 without registering or waiting for an OTP email.
 
 Run once from the project folder (the one containing main.py):
     python seed_demo.py
 
-Safe to run more than once: existing demo data is not duplicated.
+Safe to run more than once: existing demo accounts are not duplicated.
 """
 import os
 import sqlite3
-from datetime import datetime, timezone, timedelta
 
 from werkzeug.security import generate_password_hash
 
-
+# main.py opens "test.db" and "dish_database.db" relative to the current
+# folder, so work from the folder this script lives in.
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 USERS_DB = "test.db"
 DISH_DB = "dish_database.db"
 
-# Demo account with password
 DEMO_STUDENT = ("demo_student", "student@example.com", "Student123!", "student")
 DEMO_VENDOR = ("demo_vendor", "vendor@example.com", "Vendor123!", "vendor")
-
-SAMPLE_DISHES = [
-
-    ("Nasi Lemak", "Rice", 6.50, "Coconut rice with sambal, egg and anchovies.",
-     650, "Rice, coconut milk, anchovies, egg, sambal", "No", "Medium", "Egg, Fish", "Yes"),
-    ("Vegetable Fried Rice", "Rice", 5.50, "Wok-fried rice with mixed vegetables.",
-     520, "Rice, carrot, peas, cabbage, soy sauce", "Yes", "Mild", "Soy", "Yes"),
-    ("Chicken Laksa", "Noodles", 8.00, "Spicy coconut curry noodle soup with chicken.",
-     720, "Rice noodles, chicken, coconut milk, chilli", "No", "Hot", "Shellfish", "No"),
-]
-
-SAMPLE_REVIEWS = [
-    (5, "Really tasty and filling. Great value!"),
-    (4, "Good flavour, a little spicy for me."),
-]
 
 
 def create_tables():
@@ -126,9 +110,8 @@ def main():
     create_tables()
 
     users = sqlite3.connect(USERS_DB)
-    dishes = sqlite3.connect(DISH_DB)
 
-    student_id = add_user(users, *DEMO_STUDENT)
+    add_user(users, *DEMO_STUDENT)
     vendor_id = add_user(users, *DEMO_VENDOR)
 
     # Every vendor needs a vendors row with the same id as their users row
@@ -139,38 +122,10 @@ def main():
             (vendor_id, DEMO_VENDOR[0], "Demo Kitchen", "Block A Cafeteria", "vendor"),
         )
 
-    # Sample dishes and reviews (only if this vendor has no dishes yet)
-    if not dishes.execute(
-        "SELECT 1 FROM dishes WHERE vendor_id = ?", (vendor_id,)
-    ).fetchone():
-        for d in SAMPLE_DISHES:
-            dishes.execute(
-                "INSERT INTO dishes (vendor_id, name, category, price, description, "
-                "calories, ingredients, vegetarian, spicy_level, allergens, "
-                "availability, image_filename) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '')",
-                (vendor_id, *d),
-            )
-
-        first_dish_id = dishes.execute(
-            "SELECT id FROM dishes WHERE vendor_id = ? ORDER BY id LIMIT 1",
-            (vendor_id,),
-        ).fetchone()[0]
-        now = datetime.now(timezone(timedelta(hours=8)))
-        for i, (rating, comment) in enumerate(SAMPLE_REVIEWS):
-            posted = (now - timedelta(days=i)).strftime("%Y-%m-%d %H:%M:%S")
-            dishes.execute(
-                "INSERT INTO reviews (dish_id, user_id, student_name, rating, comment, date_posted) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
-                (first_dish_id, student_id, DEMO_STUDENT[0], rating, comment, posted),
-            )
-
     users.commit()
-    dishes.commit()
     users.close()
-    dishes.close()
 
-    print("Demo data ready.")
+    print("Demo accounts ready.")
     print(f"  Student login: {DEMO_STUDENT[1]} / {DEMO_STUDENT[2]}")
     print(f"  Vendor login:  {DEMO_VENDOR[1]} / {DEMO_VENDOR[2]}")
 
