@@ -27,11 +27,13 @@ def load_env():
 
 load_env()
 app = Flask(__name__)
-app.secret_key = "DishScope-000"
+app.secret_key = os.environ.get("SECRET_KEY", "DishScope-000")
 OTP_VALID_MINUTES = 10
 OTP_MAX_ATTEMPTS = 5
 TIME_FMT = "%Y-%m-%d %H:%M:%S"
-UPLOAD_FOLDER = 'static/img'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'img')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
@@ -589,7 +591,7 @@ def too_large(e):
     # Flash a friendly message (requires a secret_key set on your app)
     return render_template('dish-registration.html', error="The uploaded image is too large! Please choose an image under 5MB."), 413
 
-@app.route("/menu management", methods=["GET", "POST"])
+@app.route("/menu_management", methods=["GET", "POST"])
 def menu_management():
         conn = sqlite3.connect("test.db")
         conn.row_factory = (sqlite3.Row)
@@ -608,7 +610,7 @@ def menu_management():
         
         
         
-        return render_template("menu management.html", user=user, dishes=dishes, total_dishes=total_dishes,
+        return render_template("menu_management.html", user=user, dishes=dishes, total_dishes=total_dishes,
                                total_availability=total_availability, total_unavailability=total_unavailability)
 
 @app.route("/dish/<int:dish_id>", methods=["GET", "POST"])
@@ -890,4 +892,4 @@ def report_summary():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=os.environ.get("FLASK_DEBUG") == "1")
