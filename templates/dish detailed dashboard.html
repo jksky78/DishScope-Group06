@@ -23,6 +23,8 @@
                     <a href="{{ url_for('add_dish') }}">Add Dish</a>
                     <a href="{{ url_for('menu_management') }}">Menu Management</a>
                 {% endif %}
+                 <a href="{{ url_for('profile') }}">Profile</a>
+                <a href="{{ url_for('logout') }}">Log out</a>
             </div>
         </div>
     </nav>
@@ -31,7 +33,16 @@
 
 
 <body>
-
+        <!-- Flash Messages Block -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" style="padding: 10px; margin-bottom: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">
+        {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
     <div class="page">
 
         <!-- BACK BUTTON -->
@@ -217,27 +228,76 @@
     <div class="reviews-section">
         <h2>Reviews for <span id="reviewsDishName">this dish</span></h2>
         </div>
+            <form method="GET"
+                    action="{{ url_for('dish_detail', dish_id=dish['id']) }}#reviewsList"
+                    class="controls-panel">
 
-        <div class="reviews-grid" id="reviewsList">
-                        {% for review in reviews %}
-        <div class="review-card">
-            <div class="review-header">
-                <p><b>Name:</b> {{ review['student_name'] }}</p>
-                <!-- Only show date if it exists, otherwise show 'Recent' -->
-                <span class="review-date"><b>Date posted:</b>{{ review['date_posted'] if review['date_posted'] else 'Recent' }}</span>
+            <div class="control-group">
+                <label for="ratingFilter">Filter:</label>
+                <select name="rating" id="ratingFilter" onchange="this.form.submit()">
+                    <option value="all" {{ 'selected' if rating_filter == 'all' }}>All ratings</option>
+                    {% for n in [5, 4, 3, 2, 1] %}
+                    <option value="{{ n }}" {{ 'selected' if rating_filter == n|string }}>{{ n }} stars</option>
+                    {% endfor %}
+                </select>
             </div>
-            <p><b>Rating:</b> {{ review['rating'] }}/5</p>
-            <p style="word-break: break-word; overflow-wrap: break-word; margin: 0;"><b>Comment:</b> {{ review['comment'] }}</p>
-        </div>
-        {% else %}
-            <p>No reviews for this dish yet. Be the first to leave one!</p>
-        {% endfor %}
 
+            <div class="control-group">
+                <label for="sortReviews">Sort by:</label>
+                <select name="sort" id="sortReviews" onchange="this.form.submit()">
+                    <option value="recent"  {{ 'selected' if sort == 'recent' }}>Most recent</option>
+                    <option value="oldest"  {{ 'selected' if sort == 'oldest' }}>Oldest</option>
+                    <option value="highest" {{ 'selected' if sort == 'highest' }}>Highest rating</option>
+                    <option value="lowest"  {{ 'selected' if sort == 'lowest' }}>Lowest rating</option>
+                </select>
+            </div>
+    
+            </form>
+            
+            <div class="reviews-grid" id="reviewsList">
+                        {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <p><b>Name:</b> {{ review['student_name'] }}</p>
+                        <!-- Only show date if it exists, otherwise show 'Recent' -->
+                        <span class="review-date"><b>Date posted:</b>{{ review['date_posted'] if review['date_posted'] else 'Recent' }}</span>
+                    </div>
+                    <p><b>Rating:</b> {{ review['rating'] }}/5</p>
+                    <p class="review-text"><b>Comment:</b> {{ review['comment'] }}</p>
+                </div>
+                {% else %}
+                    <p>No result found</p>
+                {% endfor %}
+            </div>
         </div>
 
         
-        </div>
+        
     </div>
+
+<section class="similar-section">
+    <h2>You might also like</h2>
+
+    <div class="similar-grid">
+        {% for item in similar_dishes %}
+        <a class="similar-card" href="{{ url_for('dish_detail', dish_id=item['id']) }}">
+            <div class="similar-img">
+                {% if item['image_filename'] %}
+                    <img src="{{ url_for('static', filename='img/' + item['image_filename']) }}"
+                         alt="{{ item['name'] }}">
+                {% else %}
+                    <div class="similar-noimg">Picture</div>
+                {% endif %}
+            </div>
+            <div class="similar-info">
+                <h3>{{ item['name'] }}</h3>
+                <p class="similar-price">RM {{ item['price'] }}</p>
+                <p class="similar-tags">{{ item['category'] }} · {{ item['spicy_level'] }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
 
 
 </div>

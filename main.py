@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for, session , flash, jsonify
 from itsdangerous import URLSafeSerializer
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -6,8 +5,8 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 import os
 import uuid
+from datetime import datetime, timezone, timedelta
 import sqlite3
-
 app = Flask(__name__)
 app.secret_key = "DishScope-000"
 UPLOAD_FOLDER = 'static/img'
@@ -22,12 +21,7 @@ def require_login():
     # Route endpoints that anyone is allowed to visit without logging in
     public_endpoints = ['login', 'register', 'static', 'home', 'verify_email','reset_password' ] 
     # Routes that ONLY vendors are allowed to access
-<<<<<<< HEAD
-    vendor_endpoints = ['add_dish', 'edit_dish', 'menu_management', 'report_summary']
-
-=======
     vendor_endpoints = ['add_dish', 'edit_dish', 'menu_management', 'report summary']
->>>>>>> a3a0b5bf50006b99d6da93cda7e80260ec26eb5b
     # If the current request endpoint requires login and user session is missing
     if request.endpoint and request.endpoint not in public_endpoints:
         if not session.get('logged_in'):
@@ -206,7 +200,6 @@ def register():
             flash_once("Registration successful! Please log in.", "success")
             return redirect(url_for('home'))
     
-
     return render_template('register.html')
     
 @app.route("/login", methods=["GET", "POST"])
@@ -245,7 +238,6 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('home'))
-
 @app.route("/verify-email", methods=["GET", "POST"])
 def verify_email():
     if request.method == "POST":
@@ -352,7 +344,6 @@ def create_dish():
     spicy_level = request.form.get("spicy_level")
     allergens = request.form.get("allergens")
     availability = request.form.get("availability")
-
     # Handle image filename if uploaded
     image_filename = ""
     if "image" in request.files:
@@ -386,7 +377,6 @@ def get_dish_from_db():
   dish = cursor.fetchone()
   conn.close()
   return dish
-
 @app.route("/dish_view", methods=["GET", "POST"])
 def dish_view():
     if "logged_in" in  session:
@@ -427,12 +417,10 @@ def dish_view():
         flash_once('You must be logged in to view that page.', 'danger')
         return redirect(url_for('home', error="You do not have access to this page, please log in"))
         
-
 @app.errorhandler(413)
 def too_large(e):
     # Flash a friendly message (requires a secret_key set on your app)
     return render_template('dish-registration.html', error="The uploaded image is too large! Please choose an image under 5MB."), 413
-
 
 @app.route("/menu management", methods=["GET", "POST"])
 def menu_management():
@@ -455,7 +443,6 @@ def menu_management():
         
         return render_template("menu management.html", user=user, dishes=dishes, total_dishes=total_dishes,
                                total_availability=total_availability, total_unavailability=total_unavailability)
-
 
 @app.route("/dish/<int:dish_id>", methods=["GET", "POST"])
 def dish_detail(dish_id):
@@ -488,10 +475,51 @@ def dish_detail(dish_id):
             vendor = cursor_users.execute('SELECT vendor_name FROM vendors WHERE id = ?', (dish['vendor_id'],)).fetchone()
     
         conn_users.close()
-    
-    # 3. Pass both 'dish' and 'vendor' to the template
-        return render_template("dish detailed dashboard.html", dish=dish, vendor=vendor, reviews=reviews, total_reviews=total_reviews, avg_rating=avg_rating)
-
+    # Ratings filter
+        rating_filter = request.args.get('rating', 'all')
+        sort = request.args.get('sort', 'recent')
+    # whitelist ORDER BY options
+        order_options = {
+            'recent':  'date_posted DESC',
+            'oldest':  'date_posted ASC',
+            'highest': 'rating DESC, date_posted DESC',
+            'lowest':  'rating ASC, date_posted DESC',
+        }
+        order_by = order_options.get(sort, order_options['recent'])
+        query = "SELECT * FROM reviews WHERE dish_id = ?"
+        params = [dish_id]
+        if rating_filter in ('1', '2', '3', '4', '5'):
+            query += " AND rating = ?"
+            params.append(int(rating_filter))
+        query += " ORDER BY " + order_by
+        conn = sqlite3.connect("dish_database.db")
+        conn.row_factory = sqlite3.Row
+        reviews = conn.execute(query, params).fetchall()
+    # Summary stats must come from ALL reviews, not the filtered list
+        stats = conn.execute(
+            "SELECT ROUND(AVG(rating), 1) AS avg_rating, COUNT(*) AS total "
+            "FROM reviews WHERE dish_id = ?", (dish_id,)
+        ).fetchone()
+        similar_dishes = conn.execute("""
+        SELECT id, name, category, price, vegetarian, spicy_level, image_filename
+        FROM dishes
+        WHERE category = ?
+          AND id != ?
+        ORDER BY
+            (vegetarian = ?) DESC,
+            ABS(CAST(price AS REAL) - ?) ASC
+        LIMIT 4
+    """, (
+        dish['category'],
+        dish['id'],
+        dish['vegetarian'],
+        float(dish['price'])
+    )).fetchall()
+        conn.close()
+        
+        return render_template("dish detailed dashboard.html", dish=dish, vendor=vendor, reviews=reviews, 
+                               total_reviews=total_reviews, avg_rating=avg_rating, rating_filter=rating_filter, sort=sort,
+                               similar_dishes=similar_dishes)
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
@@ -519,7 +547,7 @@ def profile():
         conn.commit()
         conn.close()
         
-        # Refresh the page to show updated info
+        # Refresh the page 
         flash_once("Profile updated successfully!", "success")
         return redirect(url_for('profile'))
     user = cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
@@ -533,7 +561,7 @@ def profile():
 def add_review(dish_id):
     print("ALL FORM DATA:", request.form)
     user_id = session.get('user_id')
-    rating = request.form.get('rating')  # Grabs the star number (e.g., "5")
+    rating = request.form.get('rating') 
     comment = request.form.get('comment')
  
     if not rating:
@@ -543,7 +571,7 @@ def add_review(dish_id):
     
     rating_int = int(rating)
     
-    # 1. Fetch student name from test.db
+    # Fetch student name from test.db
     conn_users = sqlite3.connect("test.db")
     conn_users.row_factory = sqlite3.Row
     cursor_users = conn_users.cursor()
@@ -552,13 +580,16 @@ def add_review(dish_id):
     
     student_name = student['name'] if student else "Anonymous"
     
-    # 2. Save review into dish_database.db
+    # Save review into dish_database.db
+    malaysia_time = timezone(timedelta(hours=8))
+    date_post = datetime.now(malaysia_time).strftime("%Y-%m-%d %H:%M:%S")
     conn = sqlite3.connect("dish_database.db")
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO reviews (dish_id, user_id, student_name, rating, comment)
-        VALUES (?, ?, ?, ?, ?)
-    """, (dish_id, user_id, student_name, rating_int, comment))
+        INSERT INTO reviews (dish_id, user_id, student_name, rating, comment, date_posted)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (dish_id, user_id, student_name, rating_int, comment, date_post))
     
     conn.commit()
     conn.close()
@@ -685,21 +716,7 @@ def report_summary():
         ORDER BY review_count DESC 
         LIMIT 1
     """, (user_id,)).fetchone()
-
     return render_template("report summary.html", vendor=vendor, total_dishes=total_dishes,
                             total_reviews=total_reviews, highest_rated=highest_rated, most_reviewed=most_reviewed)
-
-<<<<<<< HEAD
-
-
-
-@app.route("/review rating", methods=["GET", "POST"])
-def review_rating():
-    return render_template("review rating.html") 
-
-
-
-=======
->>>>>>> a3a0b5bf50006b99d6da93cda7e80260ec26eb5b
 if __name__ == "__main__":
     app.run(debug=True)
