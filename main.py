@@ -9,7 +9,7 @@ import os, hmac, hashlib, secrets, smtplib, sqlite3, random, time
 import uuid
 from datetime import datetime, timezone, timedelta
 import sqlite3
-
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 def load_env():
     try:
         with open(".env", "r") as file:
