@@ -1,0 +1,49 @@
+
+
+/* ---- new lines below ---- (edit / delete review buttons) */
+/* Container that holds the Edit and Delete buttons on a review card */
+.review-owner-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Shared base for both action buttons */
+.btn-review-edit,
+.btn-review-delete {
+    padding: 5px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.15s, border-color 0.15s, filter 0.15s;
+    font-family: inherit;
+}
+
+/* Edit button – indigo pill (matches the app's secondary style) */
+.btn-review-edit {
+    background: var(--indigo-50);
+    color: var(--indigo);
+    border-color: var(--indigo-100);
+}
+.btn-review-edit:hover {
+    background: var(--indigo-100);
+    border-color: var(--indigo-200);
+    filter: none;
+    transform: none;
+}
+
+/* Delete button – soft red pill */
+.btn-review-delete {
+    background: rgba(229, 62, 62, 0.07);
+    color: var(--danger);
+    border-color: rgba(229, 62, 62, 0.22);
+}
+.btn-review-delete:hover {
+    background: rgba(229, 62, 62, 0.15);
+    filter: none;
+    transform: none;
+}
+/* ---- end new lines ---- */

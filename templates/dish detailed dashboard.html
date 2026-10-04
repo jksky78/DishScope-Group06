@@ -1,0 +1,77 @@
+
+
+<!-- ---- new lines below ---- (edit/cancel review JS logic) -->
+<script>
+    // Base URL used to restore the form action when cancelling an edit
+    var ADD_REVIEW_URL = "{{ url_for('add_review', dish_id=dish['id']) }}";
+
+    /**
+     * editFromButton – safely extracts review data from button's data-* attributes
+     * and passes them to startEditReview(). This avoids quote-escaping issues.
+     *
+     * @param {HTMLElement} button – the Edit button element
+     */
+    function editFromButton(button) {
+        var reviewId = button.getAttribute('data-review-id');
+        var rating = button.getAttribute('data-review-rating');
+        var comment = button.getAttribute('data-review-comment');
+        startEditReview(reviewId, rating, comment);
+    }
+
+    /**
+     * startEditReview – pre-fills the "Write a review" form with the
+     * selected review's data so the student can update it in place.
+     *
+     * @param {number} reviewId  – primary key of the review row
+     * @param {number} rating    – current star rating (1-5)
+     * @param {string} comment   – current comment text
+     */
+    function startEditReview(reviewId, rating, comment) {
+        // 1. Update the form title to signal edit mode
+        document.getElementById('reviewFormTitle').textContent = 'Edit your review';
+
+        // 2. Point the form to the edit route instead of the add route
+        document.getElementById('reviewForm').action = '/review/' + reviewId + '/edit';
+
+        // 3. Pre-select the correct star radio button
+        var starRadio = document.querySelector('input[name="rating"][value="' + rating + '"]');
+        if (starRadio) { starRadio.checked = true; }
+
+        // 4. Fill the comment textarea with the existing comment
+        document.getElementById('comment').value = comment;
+
+        // 5. Change the submit button label
+        document.getElementById('submitBtn').textContent = 'Update review';
+
+        // 6. Reveal the Cancel button
+        document.getElementById('cancelBtn').style.display = 'inline-block';
+
+        // 7. Scroll smoothly up to the form
+        document.querySelector('.write-review-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /**
+     * cancelEdit – resets the review form back to "write new review" state.
+     * Called by the existing Cancel button: onclick="cancelEdit()"
+     */
+    function cancelEdit() {
+        // 1. Restore the form title
+        document.getElementById('reviewFormTitle').textContent = 'Write a review';
+
+        // 2. Restore the form action to the add-review route
+        document.getElementById('reviewForm').action = ADD_REVIEW_URL;
+
+        // 3. Clear all star selections
+        document.querySelectorAll('input[name="rating"]').forEach(function(r) { r.checked = false; });
+
+        // 4. Clear the comment textarea
+        document.getElementById('comment').value = '';
+
+        // 5. Reset the submit button label
+        document.getElementById('submitBtn').textContent = 'Post review';
+
+        // 6. Hide the Cancel button again
+        document.getElementById('cancelBtn').style.display = 'none';
+    }
+</script>
+<!-- ---- end new lines ---- -->
