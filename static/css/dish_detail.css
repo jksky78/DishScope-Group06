@@ -117,7 +117,6 @@ header h1 {
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -186,7 +185,6 @@ header h1 {
     z-index: 1001;
     padding: 6px;
 }
-
 .dropdown-content a {
     display: block;
     padding: 9px 14px;
@@ -288,7 +286,6 @@ p.description {
     color: var(--border-2);
     transition: color 0.2s;
 }
-
 .star-rating input:checked ~ label,
 .star-rating label:hover,
 .star-rating label:hover ~ label {
