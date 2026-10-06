@@ -27,7 +27,7 @@ def load_env():
 
 load_env()
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "DishScope-000")
+app.secret_key = os.environ.get("SECRET_KEY")
 OTP_VALID_MINUTES = 10
 OTP_MAX_ATTEMPTS = 5
 TIME_FMT = "%Y-%m-%d %H:%M:%S"
